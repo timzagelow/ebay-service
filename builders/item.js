@@ -84,4 +84,12 @@ module.exports = class build {
             return `${process.env.INVENTORY_IMAGE_PATH}/${image.url}`;
         })
     }
+
+    static notes() {
+        return build.item.notes.map(note => {
+            if (!note.type) {
+                return note.text;
+            }
+        });
+    }
 };

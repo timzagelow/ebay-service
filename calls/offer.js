@@ -1,16 +1,10 @@
 const axios = require('axios');
-const auth = require('../auth');
+const buildDescription = require('../builders/description');
 
 async function get(offerId) {
-    try {
-        const { data } = await axios.get(`${process.env.EBAY_API_URL}/sell/inventory/v1/offer/${offerId}`, config);
+    const { data } = await axios.get(`${process.env.EBAY_API_URL}/sell/inventory/v1/offer/${offerId}`);
 
-        return data;
-    } catch (err) {
-        // console.log(err);
-        console.log(err.response.status);
-        console.log(err.response.data);
-    }
+    return data;
 }
 
 async function update(offerId, payload) {
@@ -22,55 +16,34 @@ async function update(offerId, payload) {
         }
     }
 
-    const { data } = await axios.put(`${process.env.EBAY_API_URL}/sell/inventory/v1/offer/${offerId}`, offer, config);
-
-    console.log(data);
+    const { data } = await axios.put(`${process.env.EBAY_API_URL}/sell/inventory/v1/offer/${offerId}`, offer);
 }
 
 async function publish(offerId) {
-    try {
-        const { data } = await axios.post(`${process.env.EBAY_API_URL}/sell/inventory/v1/offer/${offerId}/publish`, {}, config);
-
-        console.dir(data, { depth: null });
+        const { data } = await axios.post(`${process.env.EBAY_API_URL}/sell/inventory/v1/offer/${offerId}/publish`, {});
 
         return data.listingId;
-    } catch (err) {
-        // console.log(err);
-        console.log(err.response.status);
-        console.log(err.response.data);
-    }
 }
 
 async function withdraw(offerId) {
-    try {
-        const { data } = await axios.post(`${process.env.EBAY_API_URL}/sell/inventory/v1/offer/${offerId}/withdraw`, {}, config);
+    const { data } = await axios.post(`${process.env.EBAY_API_URL}/sell/inventory/v1/offer/${offerId}/withdraw`, {});
 
-        console.dir(data, { depth: null });
-
-        let listingId = data.listingId; // this will return if it was ended
-    } catch (err) {
-        // console.log(err);
-        console.log(err.response.status);
-        console.log(err.response.data);
+    if (data.listingId) {
+        return data.listingId;
     }
 }
 
-async function create(itemId) {
-    try {
-        let params = buildPayload(itemId);
-        console.log(params);
+async function create(itemId, itemData) {
+    let params = await buildPayload(itemId, itemData);
 
-        const { data } = await axios.post(`${process.env.EBAY_API_URL}/sell/inventory/v1/offer`, params, config);
+    const { data } = await axios.post(`${process.env.EBAY_API_URL}/sell/inventory/v1/offer`, params);
 
-        console.log(data);
-        let offerId = data.offerId; // 7915524010
-    } catch (err) {
-        console.log(err.response.status);
-        console.log(err.response.data);
+    if (data.offerId) {
+        return data.offerId;
     }
 }
 
-function buildPayload(itemId) {
+async function buildPayload(itemId, itemData) {
     return {
         categoryId: process.env.EBAY_RECORDS_CATEGORY_ID,
         format: process.env.EBAY_LISTING_FORMAT,
@@ -82,13 +55,14 @@ function buildPayload(itemId) {
         },
         marketplaceId: process.env.EBAY_MARKETPLACE_ID,
         sku: itemId.toString(),
-        merchantLocationKey: '36e3', // LOCATION!
+        merchantLocationKey: 'warehouse',
         pricingSummary: {
             price: {
                 currency: "USD",
-                value: "10"
+                value: itemData.price.toString()
             }
-        }
+        },
+        listingDescription: await buildDescription(itemData),
     };
 }
 

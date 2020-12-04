@@ -1,20 +1,12 @@
-const axios = require('axios');
 const conditions = require('../static/conditions');
 const builder = require('../builders/item');
 const buildTitle = require('../builders/title');
+const inventoryItem = require('../calls/inventoryItem');
 
-async function add(itemId) {
-    const item = await fetchItem(itemId);
-    const inventoryItem = build(item);
+async function addOrUpdate(itemId, item) {
+    const payload = await build(item);
 
-    console.dir(item, { depth: null });
-    console.dir(inventoryItem, { depth: null });
-}
-
-async function fetchItem(itemId) {
-    const item = await axios.get(`${process.env.INVENTORY_API_URL}/inventory/${itemId}`);
-
-    return item.data;
+    await inventoryItem.add(itemId, payload);
 }
 
 function build(item) {
@@ -50,13 +42,12 @@ function build(item) {
         aspects['Edition'] = builder.edition();
     }
 
-    // console.log(builder.condition('cover'));
-
     if (builder.condition('cover')) {
         aspects['Sleeve Grading'] = builder.condition('cover');
     }
 
-    // let imageUrls = [ 'https://www.recordsbymail.com/transparent-glowing-logo.png' ];
+    // let imageUrls = builder.imageUrls();
+    let imageUrls = [ 'https://www.recordsbymail.com/transparent-glowing-logo.png' ];
 
     return {
         availability: {
@@ -67,11 +58,11 @@ function build(item) {
         condition: condition,
         product: {
             aspects: aspects,
-            // description: buildDescription(item),
-            imageUrls: builder.imageUrls(),
+            imageUrls: imageUrls,
             title: buildTitle(item),
-        }
+        },
+        upc: [ 'Does not apply' ],
     };
 }
 
-module.exports = add;
+module.exports = addOrUpdate;

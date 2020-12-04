@@ -3,18 +3,17 @@ const auth = require('./auth');
 
 function init() {
     axios.interceptors.request.use(req => {
-        if (req.url.includes(process.env.EBAY_API_URL)) {
-
-            auth.getToken().then(token => {
-                req.headers.authorization = `Bearer ${token}`;
-                req.headers['Content-Language'] = 'en-US';
-            });
+        if (req.url.includes(process.env.EBAY_API_URL) && !req.url.includes('identity')) {
+            req.headers.authorization = `Bearer ${auth.token}`;
+            req.headers['Content-Language'] = 'en-US';
         }
 
         // console.log(`${req.method} ${req.url}`);
         // Important: request interceptors **must** return the request.
         return req;
     });
+
+    createAxiosResponseInterceptor();
 }
 
 function createAxiosResponseInterceptor() {
@@ -34,18 +33,21 @@ function createAxiosResponseInterceptor() {
             axios.interceptors.response.eject(interceptor);
 
             // console.log(error.response.data);
-            return Auth.refreshToken().then(response => {
+            return auth.refreshToken().then(response => {
                 console.log('refreshing token');
+                console.log('response from refresh token', response);
 
-                Auth.setToken(response.data.access_token);
-                console.log(Auth.getToken());
+                auth.token = response.data.access_token;
+
                 error.response.config.headers['Authorization'] = 'Bearer ' + response.data.access_token;
 
                 return axios(error.response.config);
             }).catch(error => {
                 console.log('error refreshing token');
-                Auth.token = null;
-                // this.router.push('/login');
+                console.log(error.response);
+
+                auth.token = null;
+
                 return Promise.reject(error);
             }).finally(createAxiosResponseInterceptor);
         }

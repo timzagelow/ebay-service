@@ -1,0 +1,197 @@
+<body>
+<style>
+    body {
+        margin: 0;
+        padding: 0; }
+
+    table {
+        border-spacing: 0; }
+
+    .item-content {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 16px;
+        background: #dfdfc8;
+        background: #C2C097;
+        line-height: 24px;
+        padding: 16px 0; }
+
+    .item-content a {
+        color: #4b4b2f; }
+
+    .item-content p {
+        padding: 0 16px; }
+
+    .item-content .item-details p {
+        padding: 0;
+        margin: 0; }
+
+    .item-content .top-margin {
+        margin-top: 16px; }
+
+    .item-content .info-block {
+        margin: 16px;
+        background: #E3E2CF;
+        box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        border-radius: 6px;
+        overflow: hidden; }
+
+    .item-content .info-block.no-top-margin {
+        margin-top: 0; }
+
+    .item-content .info-block.no-bottom-margin {
+        margin-bottom: 0; }
+
+    .item-content .no-top-padding {
+        padding-top: 0; }
+
+    .item-content .category-bg {
+        background: #e8e8d8; }
+
+    .item-content h1 {
+        margin-left: 16px;
+        font-size: 20px; }
+
+    .item-content h3 {
+        color: #a44103;
+        background: #f1f1e7;
+        /*	border-bottom: 1px solid #BDBCA4; */
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px; }
+
+    .item-content h3 {
+        font-size: 24px;
+        line-height: 30px; }
+
+    .item-content h2 {
+        color: #a44103; }
+
+    .item-content h2, .item-content h3, .item-content h4, .item-content h5 {
+        padding: 8px 16px;
+        margin: 0; }
+
+    .item-content h4 {
+        color: #a44103;
+        font-weight: 400;
+        font-size: 20px; }
+
+    .item-content h5 {
+        color: #4b4b2f;
+        font-size: 16px; }
+
+    .item-content ul {
+        padding: 0;
+        margin: 0;
+        list-style: none; }
+
+    .item-content em {
+        font-size: 14px; }
+
+    .item-content .item-details {
+        padding-bottom: 16px;
+        padding-top: 16px; }
+
+    .horiz-margin {
+        margin-left: 16px;
+        margin-right: 16px; }
+
+    .item-content ul.categories li {
+        float: left;
+        width: 33.3%;
+        min-width: 150px; }
+
+    .item-content ul.categories li a {
+        background-color: #e8e8d8;
+        display: block;
+        padding: 8px 16px;
+        border-color: #f1f1e7;
+        border-color: rgba(255, 255, 255, 0.2) rgba(0, 0, 0, 0.05) rgba(0, 0, 0, 0.05) rgba(255, 255, 255, 0.2);
+        border-style: solid;
+        border-width: 1px;
+    }
+
+    .item-content ul.categories li a:hover {
+        background: #99ae6e;
+        color: #f3f3eb; }
+
+    .item-content ul.categories li a.no-bottom-border {
+        border-bottom: 0; }
+
+    .item-content ul.categories li:nth-child(3n+3) a {
+        border-right: 0 none; }
+
+    .item-content .price-text {
+        color: #a44103; }
+
+    .item-content .tbl {
+        margin: 0 16px 16px 16px;
+        border-collapse: collapse; }
+
+    .item-content .tbl th {
+        padding: 8px;
+        text-align: left;
+        background: #D9D7BC;
+        color: #4b4b2f;
+        font-weight: 400; }
+
+    .item-content .tbl td {
+        padding: 8px;
+        background-color: #e8e8d8;
+        border-bottom: 1px solid #d5d5cb;
+        border-right: 1px solid rgba(0, 0, 0, 0.1); }
+
+    .item-content .tbl td:last-child {
+        border-right: 0 none; }
+
+    .item-content .tbl.grading {
+        margin-top: 16px; }
+
+    .clear {
+        clear: both; }
+
+    @media screen and (max-width: 500px) {
+        .item-content .tbl.grading th {
+            display: none; }
+
+        .item-content .tbl.grading td {
+            border: none; }
+
+        .item-content .tbl.grading td {
+            display: inline-block; }
+
+        .item-content .tbl.grading tr {
+            background: #e8e8d8; }
+
+        .item-content .tbl.grading td:nth-child(3) {
+            background: #dfdfc8; }
+
+        .item-content .tbl.grading td:last-child {
+            display: block; }
+
+        .item-content .tbl.grading tr:last-child {
+            border-bottom: none; }
+
+        .item-content .categories-block {
+            display: none; }
+    }
+
+</style>
+
+<div class="item-content">
+    <div class="info-block no-top-margin">
+        <h3>Item Details</h3>
+        <div class="item-details">
+            <h4 class="no-top-padding">{{ artist }}<br>{{ title }}</h4>
+            <div class="horiz-margin">
+                <p><strong>Label:</strong> {{ label }} {{ catalogNo }}</p>
+                <p><strong>Format:</strong> {{ format }}</p>
+                <p><strong>Condition:</strong> {{ discCondition }}</p>
+                <p><strong>Speed:</strong> {{ speed }}</p>
+                <p><strong>Genre:</strong> {{ genre }}</p>
+                <p><strong>Notes:</strong> {{ notes }}</p>
+                <p><strong>Price:</strong> ${{ price }}</p>
+                {{ clips }}
+            </div>
+        </div>
+    </div>
+</div>
+</body>

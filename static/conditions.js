@@ -1,6 +1,6 @@
 module.exports = {
-    'SS': 'NEW',
-    'M-': 'LIKE_NEW',
+    'SS': 'USED_EXCELLENT',
+    'M-': 'USED_EXCELLENT',
     'VG+': 'USED_EXCELLENT',
     'VG': 'USED_VERY_GOOD',
     'VG-': 'USED_GOOD',

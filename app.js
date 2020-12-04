@@ -1,30 +1,37 @@
 const Queue = require('bull');
 require('dotenv').config();
-const processor = require('./jobs/processor');
 const db = require('./db');
-const cache = require('./workers/cache');
 const inventoryItem = require('./calls/inventoryItem');
 const offer = require('./calls/offer');
 const api = require('./api');
+const item = require('./calls/item');
+const itemStore = require('./store/item');
 
-const addItem = require('./jobs/addItem');
+const addOrUpdateItem = require('./jobs/addOrUpdateItem');
 
 (async() => {
     await db.load();
     api.init();
 
-    addItem(16597);
+    try {
+        let itemId = 16597;
+        const itemData = await item.fetch(itemId);
 
-    // await offerItem(123);
-    // const item = await inventoryItem.get(123);
-    // console.log(item);
-    // await offerItem.publish(7915524010);
-    // await offerItem.withdraw(7915524010);
-    // await offerItem.update(7915524010, { merchantLocationKey: 'warehouse' });
-    // await offerItem.get(7915524010);
-    // await cache.buildCache();
-    // listingId = 110527211938
+        await addOrUpdateItem(itemId, itemData); // unless there's an error, create offer
 
+        // await itemStore.update(itemId, { status: 'inactive' });
+
+        // const offerId = await offer.create(itemId, itemData);
+        // await itemStore.update(itemId, { offerId: offerId });
+
+        // const listingId = await offer.publish(offerId);
+        // await itemStore.update(itemId, { listingId: listingId, status: 'active' });
+
+        // await offer.withdraw(offerId);
+
+    } catch (err) {
+        console.dir(err.response.data, { depth: null });
+    }
 })();
 
 
