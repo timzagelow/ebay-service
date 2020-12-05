@@ -1,5 +1,5 @@
 const axios = require('axios');
-const buildDescription = require('../builders/description');
+const buildPayload = require('../../builders/offer');
 
 async function get(offerId) {
     const { data } = await axios.get(`${process.env.EBAY_API_URL}/sell/inventory/v1/offer/${offerId}`);
@@ -17,6 +17,8 @@ async function update(offerId, payload) {
     }
 
     const { data } = await axios.put(`${process.env.EBAY_API_URL}/sell/inventory/v1/offer/${offerId}`, offer);
+
+    return data;
 }
 
 async function publish(offerId) {
@@ -43,27 +45,8 @@ async function create(itemId, itemData) {
     }
 }
 
-async function buildPayload(itemId, itemData) {
-    return {
-        categoryId: process.env.EBAY_RECORDS_CATEGORY_ID,
-        format: process.env.EBAY_LISTING_FORMAT,
-        includeCatalogProductDetails: false,
-        listingPolicies: {
-            paymentPolicyId: process.env.EBAY_PAYMENT_POLICY_ID,
-            returnPolicyId: process.env.EBAY_RETURN_POLICY_ID,
-            fulfillmentPolicyId: process.env.EBAY_FULFILLMENT_POLICY_ID,
-        },
-        marketplaceId: process.env.EBAY_MARKETPLACE_ID,
-        sku: itemId.toString(),
-        merchantLocationKey: 'warehouse',
-        pricingSummary: {
-            price: {
-                currency: "USD",
-                value: itemData.price.toString()
-            }
-        },
-        listingDescription: await buildDescription(itemData),
-    };
+async function remove(offerId) {
+    await axios.delete(`${process.env.EBAY_API_URL}/sell/inventory/v1/offer/${offerId}`, {});
 }
 
-module.exports = { create, publish, get, update, withdraw };
+module.exports = { create, publish, get, update, withdraw, remove };

@@ -1,12 +1,12 @@
 const conditions = require('../static/conditions');
 const builder = require('../builders/item');
 const buildTitle = require('../builders/title');
-const inventoryItem = require('../calls/inventoryItem');
+const inventoryItem = require('../api/partner/inventoryItem');
 
 async function addOrUpdate(itemId, item) {
     const payload = await build(item);
 
-    await inventoryItem.add(itemId, payload);
+    return await inventoryItem.add(itemId, payload);
 }
 
 function build(item) {

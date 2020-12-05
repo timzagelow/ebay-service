@@ -1,10 +1,10 @@
 const Queue = require('bull');
 require('dotenv').config();
 const db = require('./db');
-const inventoryItem = require('./calls/inventoryItem');
-const offer = require('./calls/offer');
+const inventoryItem = require('./api/partner/inventoryItem');
+const offer = require('./api/partner/offer');
 const api = require('./api');
-const item = require('./calls/item');
+const item = require('./api/internal/item');
 const itemStore = require('./store/item');
 
 const addOrUpdateItem = require('./jobs/addOrUpdateItem');
