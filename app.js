@@ -6,8 +6,10 @@ const logger = require('./logger');
 const removeItem = require('./workers/removeItem');
 const addItem = require('./workers/addItem');
 const updateItem = require('./workers/updateItem');
-const offer = require('./api/partner/offer');
-const DbItem = require('./models/Item');
+const descriptionBuilder = require('./builders/description');
+const itemBuilder = require('./builders/item');
+const internalItem = require('./api/internal/item');
+
 
 (async() => {
     await db.load();
@@ -19,12 +21,11 @@ const DbItem = require('./models/Item');
         await updateItem(itemId);
         logger.info(`Updated item ${itemId}`);
     } catch (err) {
-        // console.dir(err, { depth: null });
+        console.dir(err, { depth: null });
 
         // console.dir(err.response.data, { depth: null });
     }
 })();
-
 
 // setup job runner
 // const ebayItemQueue = new Queue(process.env.EBAY_ITEM_QUEUE, process.env.REDIS_CONNECTION_STRING);

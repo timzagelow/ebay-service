@@ -13,6 +13,16 @@ module.exports = class build {
         return obj && obj.name ? obj.name : '';
     }
 
+    static conditions() {
+        return build.item.condition.map(c => {
+            return {
+                name: c.name,
+                type: c.type.charAt(0).toUpperCase() + c.type.slice(1),
+                text: c.text.join(', '),
+            }
+        });
+    }
+
     static artist() {
         if (build.item.artist.first) {
             return [ build.item.artist.first, build.item.artist.last ].join(' ');
@@ -41,6 +51,10 @@ module.exports = class build {
         });
 
         return itemGenre;
+    }
+
+    static genres() {
+        return build.item.genres.map(genre => genre.name);
     }
 
     static style() {
@@ -79,6 +93,28 @@ module.exports = class build {
         });
     }
 
+    static pressing() {
+        let pressings = {};
+
+        build.item.pressing.forEach(p => {
+            let type = p.type.charAt(0).toUpperCase() + p.type.slice(1);
+
+            if (!pressings[type]) {
+                pressings[type] = [];
+            }
+
+            pressings[type].push(p.text);
+        });
+
+        for (let type in pressings) {
+            if (pressings.hasOwnProperty(type)) {
+                pressings[type] = pressings[type].join(', ');
+            }
+        }
+
+        return pressings;
+    }
+
     static imageUrls() {
         return build.item.images.map(image => {
             return `${process.env.INVENTORY_IMAGE_PATH}/${image.url}`;
@@ -91,5 +127,13 @@ module.exports = class build {
                 return note.text;
             }
         });
+    }
+
+    static mediaTexts() {
+        return build.item.media.map(item => {
+            let countStr = item.count > 1 ? `${item.count} x ` : ``;
+
+            return `${countStr}${item.size}" ${item.duration} (${item.speed} RPM)`;
+        })
     }
 };
