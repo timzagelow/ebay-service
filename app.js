@@ -1,36 +1,27 @@
 const Queue = require('bull');
 require('dotenv').config();
 const db = require('./db');
-const inventoryItem = require('./api/partner/inventoryItem');
-const offer = require('./api/partner/offer');
 const api = require('./api');
-const item = require('./api/internal/item');
-const itemStore = require('./store/item');
-
-const addOrUpdateItem = require('./jobs/addOrUpdateItem');
+const logger = require('./logger');
+const removeItem = require('./workers/removeItem');
+const addItem = require('./workers/addItem');
+const updateItem = require('./workers/updateItem');
+const offer = require('./api/partner/offer');
+const DbItem = require('./models/Item');
 
 (async() => {
     await db.load();
     api.init();
 
     try {
-        let itemId = 16597;
-        const itemData = await item.fetch(itemId);
+        let itemId = 149389;
 
-        await addOrUpdateItem(itemId, itemData); // unless there's an error, create offer
-
-        // await itemStore.update(itemId, { status: 'inactive' });
-
-        // const offerId = await offer.create(itemId, itemData);
-        // await itemStore.update(itemId, { offerId: offerId });
-
-        // const listingId = await offer.publish(offerId);
-        // await itemStore.update(itemId, { listingId: listingId, status: 'active' });
-
-        // await offer.withdraw(offerId);
-
+        await updateItem(itemId);
+        logger.info(`Updated item ${itemId}`);
     } catch (err) {
-        console.dir(err.response.data, { depth: null });
+        // console.dir(err, { depth: null });
+
+        // console.dir(err.response.data, { depth: null });
     }
 })();
 

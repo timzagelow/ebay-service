@@ -1,6 +1,13 @@
 const axios = require('axios');
 const buildPayload = require('../../builders/offer');
 
+async function getAll(itemId) {
+    const { data } = await axios.get(`${process.env.EBAY_API_URL}/sell/inventory/v1/offer?sku=${itemId}&marketplace_id=${process.env.EBAY_MARKETPLACE_ID}`);
+
+    return data.offers;
+}
+
+
 async function get(offerId) {
     const { data } = await axios.get(`${process.env.EBAY_API_URL}/sell/inventory/v1/offer/${offerId}`);
 
@@ -38,6 +45,7 @@ async function withdraw(offerId) {
 async function create(itemId, itemData) {
     let params = await buildPayload(itemId, itemData);
 
+
     const { data } = await axios.post(`${process.env.EBAY_API_URL}/sell/inventory/v1/offer`, params);
 
     if (data.offerId) {
@@ -49,4 +57,4 @@ async function remove(offerId) {
     await axios.delete(`${process.env.EBAY_API_URL}/sell/inventory/v1/offer/${offerId}`, {});
 }
 
-module.exports = { create, publish, get, update, withdraw, remove };
+module.exports = { create, publish, get, getAll, update, withdraw, remove };

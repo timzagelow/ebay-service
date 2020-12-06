@@ -1,4 +1,4 @@
-const buildDescription = require('../../builders/description');
+const buildDescription = require('./description');
 
 async function buildPayload(itemId, itemData) {
     return {

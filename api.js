@@ -1,5 +1,6 @@
 const axios = require('axios');
 const auth = require('./auth');
+const logger = require('./logger');
 
 function init() {
     axios.interceptors.request.use(req => {
@@ -8,9 +9,18 @@ function init() {
             req.headers['Content-Language'] = 'en-US';
         }
 
-        // console.log(`${req.method} ${req.url}`);
+        console.log(`${req.method} ${req.url}`);
         // Important: request interceptors **must** return the request.
         return req;
+    });
+
+    axios.interceptors.response.use(response => response, error => {
+        if (error.code === 'ECONNREFUSED') {
+            logger.error('Connection refused', error.config);
+
+        }
+
+        return Promise.reject(error);
     });
 
     createAxiosResponseInterceptor();

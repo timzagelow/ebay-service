@@ -22,7 +22,8 @@
     "mongoose": "^5.11.2",
     "mustache": "^4.0.1",
     "qs": "^6.9.4",
-    "redis": "^3.0.2"
+    "redis": "^3.0.2",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "nodemon": "^2.0.6"
