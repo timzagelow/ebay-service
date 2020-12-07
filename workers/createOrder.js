@@ -35,14 +35,14 @@ async function create(data) {
         }
     };
 
-    if (data.orderPaymentStatus === 'PAID') {
+    if (data.orderPaymentStatus === process.env.EBAY_PAID_ORDER_PAYMENT_STATUS) {
         payload.payment = handlePayments(data);
         payload.shipping = [ handleShipping(data) ];
     }
 
     payload.items = await handleItems(items);
 
-    console.dir(payload, { depth: null });
+    return payload;
 }
 
 async function handleItems(items) {
@@ -62,6 +62,10 @@ async function handleItems(items) {
             shippingCost: parseFloat(item.deliveryCost.shippingCost.value),
             shipByDate: item.lineItemFulfillmentInstructions.shipByDate,
             tax: taxTotal,
+            platform: {
+                itemId: item.lineItemId,
+                site: item.purchaseMarketplaceId,
+            },
         };
     }));
 }
