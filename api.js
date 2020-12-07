@@ -1,16 +1,20 @@
 const axios = require('axios');
-const auth = require('./auth');
+const ebayAuth = require('./ebayAuth');
 const logger = require('./logger');
+const auth = require('./auth');
 
 function init() {
     axios.interceptors.request.use(req => {
         if (req.url.includes(process.env.EBAY_API_URL) && !req.url.includes('identity')) {
-            req.headers.authorization = `Bearer ${auth.token}`;
+            req.headers.authorization = `Bearer ${ebayAuth.token}`;
             req.headers['Content-Language'] = 'en-US';
+        } else if (req.url.includes(process.env.ORDERS_API_URL) ||
+            req.url.includes(process.env.INVENTORY_API_URL)) {
+            req.headers.authorization = `Bearer ${auth.token}`;
         }
 
         console.log(`${req.method} ${req.url}`);
-        // Important: request interceptors **must** return the request.
+
         return req;
     });
 
@@ -43,25 +47,46 @@ function createAxiosResponseInterceptor() {
             axios.interceptors.response.eject(interceptor);
 
             // console.log(error.response.data);
-            return auth.refreshToken().then(response => {
-                console.log('refreshing token');
-                console.log('response from refresh token', response);
+            if (error.response.config.url.includes(process.env.EBAY_API_URL)) {
+                return handleEbayRefresh(error);
+            }
 
-                auth.token = response.data.access_token;
+            if (error.response.config.url.includes(process.env.ORDERS_API_URL) ||
+                error.response.config.url.includes(process.env.INVENTORY_API_URL)) {
+                return handleInternalRefresh(error);
+            }
 
-                error.response.config.headers['Authorization'] = 'Bearer ' + response.data.access_token;
-
-                return axios(error.response.config);
-            }).catch(error => {
-                console.log('error refreshing token');
-                console.log(error.response);
-
-                auth.token = null;
-
-                return Promise.reject(error);
-            }).finally(createAxiosResponseInterceptor);
+            return Promise.reject(error);
         }
     );
 }
+
+function handleEbayRefresh(error) {
+    return ebayAuth.refreshToken().then((accessToken) => {
+        ebayAuth.setToken(accessToken);
+
+        error.response.config.headers['Authorization'] = 'Bearer ' + accessToken;
+
+        return axios(error.response.config);
+    }).catch(error => {
+        ebayAuth.setToken('');
+
+        return Promise.reject(error);
+    }).finally(createAxiosResponseInterceptor);
+}
+
+function handleInternalRefresh(error) {
+    return auth.fetchToken().then(accessToken => {
+        auth.setToken(accessToken);
+        error.response.config.headers['Authorization'] = 'Bearer ' + accessToken;
+
+        return axios(error.response.config);
+    }).catch(error => {
+        auth.setToken('');
+
+        return Promise.reject(error);
+    }).finally(createAxiosResponseInterceptor);
+}
+
 
 module.exports = { init };
