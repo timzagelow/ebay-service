@@ -4,7 +4,7 @@ const { promisify } = require('util');
 const getAsync = promisify(client.get).bind(client);
 const setAsync = promisify(client.set).bind(client);
 const moment = require('moment');
-const createOrder = require('./createOrder');
+const createOrder = require('../workers/createOrder');
 const apiOrder = require('../api/partner/order');
 
 async function getOrders() {

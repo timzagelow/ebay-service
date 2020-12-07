@@ -6,6 +6,6 @@ const processedOrderSchema = new Schema({
     ebayOrderId: String,
 }, { timestamps: true });
 
-const ProcessedOrder = mongoose.model('ProcessedOrder', processedOrderSchema);
+const ProcessedOrder = mongoose.model('processed_order', processedOrderSchema);
 
 module.exports = ProcessedOrder;
