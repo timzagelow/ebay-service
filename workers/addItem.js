@@ -1,6 +1,7 @@
-const addOrUpdateItem = require('../jobs/addOrUpdateItem');
 const offer = require('../api/partner/offer');
 const internalItem = require('../api/internal/item');
+const inventoryItem = require('../api/partner/inventoryItem');
+const buildInventoryItem = require('../builders/inventoryItem');
 const DbItem = require('../models/Item');
 const { handleApiError, handleError } = require('../errorHandler');
 const buildPayload = require('../builders/offer');
@@ -21,7 +22,9 @@ async function handle(itemId) {
     const itemData = await internalItem.fetch(itemId);
 
     try {
-        await addOrUpdateItem(itemId, itemData);
+        const payload = await buildInventoryItem(itemData);
+
+        await inventoryItem.add(itemId, payload);
     } catch (error) {
         handleApiError(`Could not create item ${itemId}`, error);
     }
