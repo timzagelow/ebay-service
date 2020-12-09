@@ -8,9 +8,8 @@ module.exports = class Auth {
     static async getToken() {
         if (!Auth.token.length) {
             try {
-                console.log('refreshing');
                 Auth.token = await Auth.refreshToken();
-            } catch (err) {
+            } catch (error) {
                 console.log(error);
             }
         }
@@ -38,6 +37,8 @@ module.exports = class Auth {
             scope: process.env.EBAY_API_SCOPE,
         });
 
-        return await axios.post(url, payload, config);
+        const response = await axios.post(url, payload, config);
+
+        return Promise.resolve(response.data.access_token);
     }
 };
