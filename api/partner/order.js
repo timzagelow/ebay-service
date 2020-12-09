@@ -17,8 +17,10 @@ async function refund(orderId, amount, reason) {
 
 }
 
-async function ship(orderId) {
+async function ship(orderId, payload) {
+    const { data } = await axios.get(`${process.env.EBAY_API_URL}/sell/fulfillment/v1/order/${orderId}/shipping_fulfillment`, payload);
 
+    return data;
 }
 
-module.exports = { fetchNew };
+module.exports = { fetchNew, ship };

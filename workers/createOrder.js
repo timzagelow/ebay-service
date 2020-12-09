@@ -7,7 +7,7 @@ const logger = require('../logger');
 async function create(order) {
     const existing = await ProcessedOrder.findOne({ ebayOrderId: order.orderId });
 
-    if (!Object.keys(existing).length) {
+    if (!existing) {
         try {
             const payload = await orderBuilder(order);
             const created = await internalOrder.create(payload);

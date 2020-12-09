@@ -57,14 +57,14 @@ async function handleItems(items) {
 
         return {
             details: details,
-            quantity: item.quantity,
-            price: parseFloat(item.lineItemCost.value),
-            shippingCost: parseFloat(item.deliveryCost.shippingCost.value),
-            shipByDate: item.lineItemFulfillmentInstructions.shipByDate,
-            tax: taxTotal,
             platform: {
                 itemId: item.lineItemId,
                 site: item.purchaseMarketplaceId,
+                quantity: item.quantity,
+                price: parseFloat(item.lineItemCost.value),
+                shippingCost: parseFloat(item.deliveryCost.shippingCost.value),
+                shipByDate: item.lineItemFulfillmentInstructions.shipByDate,
+                tax: taxTotal,
             },
         };
     }));

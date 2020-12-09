@@ -7,11 +7,22 @@ async function create(orderData) {
 
         return order.data;
     } catch (err) {
-        console.log(err.response.status);
         logger.error(`Could not create the order`, { error: err.response.data });
 
         throw Error;
     }
 }
 
-module.exports = { create };
+async function fetch(orderId) {
+    try {
+        const order = await axios.get(`${process.env.ORDERS_API_URL}/orders/${orderId}`);
+
+        return order.data;
+    } catch (err) {
+        logger.error(`Could not fetch the order`, { error: err.response.data });
+
+        throw Error;
+    }
+}
+
+module.exports = { create, fetch };
