@@ -1,6 +1,9 @@
 const buildDescription = require('./description');
+const buildItem = require('./item');
 
 async function buildPayload(itemId, itemData) {
+    buildItem.item = itemData;
+
     return {
         categoryId: process.env.EBAY_RECORDS_CATEGORY_ID,
         format: process.env.EBAY_LISTING_FORMAT,
@@ -20,6 +23,7 @@ async function buildPayload(itemId, itemData) {
             }
         },
         listingDescription: await buildDescription(itemData),
+        storeCategoryNames: [ buildItem.genre() ],
     };
 }
 
