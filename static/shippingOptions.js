@@ -1,5 +1,6 @@
 module.exports = {
-    'USPSMedia': 'Medial Mail',
+    'USPSMedia': 'Media Mail',
     'USPSPriority': 'Priority Mail',
+    'USPSFirstClass': 'First Class Mail',
     'USPSFirstClassMailInternational': 'Air Mail'
 };

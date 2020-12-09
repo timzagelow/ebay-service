@@ -35,12 +35,12 @@ async function build(data) {
         }
     };
 
+    payload.items = await handleItems(items);
+
     if (data.orderPaymentStatus === process.env.EBAY_PAID_ORDER_PAYMENT_STATUS) {
         payload.payment = handlePayments(data);
-        payload.shipping = [ handleShipping(data) ];
+        payload.shipping = [ handleShipping(data, payload.items) ];
     }
-
-    payload.items = await handleItems(items);
 
     return payload;
 }
@@ -70,8 +70,12 @@ async function handleItems(items) {
     }));
 }
 
-function handleShipping(data) {
+function handleShipping(data, items) {
     let method = shippingOptions[data.fulfillmentStartInstructions[0].shippingStep.shippingServiceCode] || data.fulfillmentStartInstructions[0].shippingStep.shippingServiceCode;
+
+    if (isMethodFirstClass(items)) {
+        method = shippingOptions['USPSFirstClass'];
+    }
 
     return {
         method: method,
@@ -88,6 +92,20 @@ function handlePayments(data) {
             transactionId: payment.paymentReferenceId,
         }
     });
+}
+
+function isMethodFirstClass(items) {
+    let smallItemCount = 0;
+
+    items.forEach(item => {
+        item.media.forEach(m => {
+            if (m.size <= process.env.SMALL_ITEM_SIZE_MAX) {
+                smallItemCount += m.count;
+            }
+        })
+    });
+
+    return smallItemCount <= process.env.FIRST_CLASS_SMALL_ITEM_MAX;
 }
 
 module.exports = build;
