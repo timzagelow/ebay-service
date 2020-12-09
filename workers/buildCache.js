@@ -8,8 +8,7 @@ const moment = require('moment');
 const coder = require('../coder');
 const Cache = require('../models/Cache');
 const EbayItem = require('../models/Item');
-
-// set & get lastInventoryCheck here
+const queue = require('../queue');
 
 function buildItemObject(item) {
     delete item._id;
@@ -44,6 +43,10 @@ function isItemActive(item) {
     return isActive;
 }
 
+function itemHasPhotos(item) {
+    return item.images && item.images.length > 0;
+}
+
 function isEbayItemActive(item) {
     return item && item.status && item.status === 'active' && item.ebayItemId.length;
 }
@@ -64,39 +67,52 @@ async function buildCache() {
                 encodedItem: encodedItem,
             };
 
-            try {
-                await Cache.create(itemObj);
-            } catch (err) {
-                console.error(err);
-            }
+            await Cache.create(itemObj);
 
-            let job = getJob(items[i], ebayItem);
+            let job = createJob(items[i], ebayItem);
+
             if (job) {
                 console.log(job, items[i].id);
             }
 
             // handle job creation
         } else {
-            // did cache change? @todo change this back to not equals!!!
-            if (cacheItem.encodedItem === encodedItem) {
-                let job = getJob(items[i], ebayItem);
+            if (cacheItem.encodedItem !== encodedItem) {
+                let job = createJob(items[i], ebayItem);
 
                 if (job) {
                     console.log(job, items[i].id);
+
+                    cacheItem.encodedItem = encodedItem;
+
+                    await cacheItem.save();
                 }
             }
         }
     }
+
+    await setLastChecked();
 }
 
-function getJob(item, ebayItem) {
-    if (isItemActive(item) && !isItemSuppressed(item) && !isEbayItemActive(ebayItem)) {
-        return 'add'
-    } else if (!isItemActive(item) && isEbayItemActive(ebayItem)) {
+function createJob(item, ebayItem) {
+    if (isItemActive(item) && !isItemSuppressed(item) && !isEbayItemActive(ebayItem) && itemHasPhotos(item)) {
+        queue.addItemQueue.add({ itemId: item.id });
+
+        return 'add';
+    }
+
+    if (!isItemActive(item) && isEbayItemActive(ebayItem)) {
+        queue.removeItemQueue.add({ itemId: item.id });
         return 'remove';
-    } else if (isItemSuppressed(item) && isEbayItemActive(ebayItem)) {
+    }
+
+    if (isItemSuppressed(item) && isEbayItemActive(ebayItem)) {
+        queue.removeItemQueue.add({ itemId: item.id });
         return 'remove';
-    } else if (isItemActive(item) && isEbayItemActive(ebayItem)) {
+    }
+
+    if (isItemActive(item) && isEbayItemActive(ebayItem)) {
+        queue.updateItemQueue.add({ itemId: item.id });
         return 'update';
     }
 }
@@ -104,7 +120,7 @@ function getJob(item, ebayItem) {
 async function getLatest() {
     const lastInventoryCheck = await getAsync('lastInventoryCheck');
     const { resp, data } = await axios.get(`${process.env.INVENTORY_API_URL}/inventory/new/${lastInventoryCheck}`);
-    // console.log(resp);
+
     return data;
 }
 
@@ -113,4 +129,4 @@ async function setLastChecked() {
     await setAsync('lastInventoryCheck', date);
 }
 
-module.exports = { buildCache };
+module.exports = buildCache;
