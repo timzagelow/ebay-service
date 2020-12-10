@@ -10,6 +10,54 @@ const Cache = require('../models/Cache');
 const EbayItem = require('../models/Item');
 const queue = require('../queue');
 
+async function buildCache() {
+    const items = await getLatest();
+
+    console.log(`${items.length} items to check against cache`);
+
+    let jobs = [];
+
+    for (let i = 0; i < items.length; i++) {
+        let cacheItem = await Cache.findOne({ itemId: items[i].id });
+        let encodedItem = buildItemObject(items[i]);
+        let ebayItem = await EbayItem.findOne({ itemId: items[i].id });
+
+        if (!cacheItem) {
+            console.log(`No cache found for item ${items[i].id}`);
+
+            // add to cache and determine if add job should be created
+            const itemObj = {
+                itemId: items[i].id,
+                encodedItem: encodedItem,
+            };
+
+            await Cache.create(itemObj);
+
+            let job = createJob(items[i], ebayItem);
+
+            if (job) {
+                jobs.push(job);
+            }
+        } else {
+            if (cacheItem.encodedItem !== encodedItem) {
+                let job = createJob(items[i], ebayItem);
+
+                if (job) {
+                    jobs.push(job);
+
+                    cacheItem.encodedItem = encodedItem;
+
+                    await cacheItem.save();
+                }
+            }
+        }
+    }
+
+    queue.itemQueue.add({ jobs: jobs });
+
+    // await setLastChecked();
+}
+
 function buildItemObject(item) {
     delete item._id;
     delete id;
@@ -48,77 +96,30 @@ function itemHasPhotos(item) {
 }
 
 function isEbayItemActive(item) {
-    return item && item.status && item.status === 'active' && item.ebayItemId.length;
-}
-
-async function buildCache() {
-    const items = await getLatest();
-
-    for (let i = 0; i < items.length; i++) {
-        // look up item in cache
-        let cacheItem = await Cache.findOne({ itemId: items[i].id });
-        let encodedItem = buildItemObject(items[i]);
-        let ebayItem = await EbayItem.find({ itemId: items[i].id });
-
-        if (!cacheItem) {
-            // add to cache and determine if add job should be created
-            const itemObj = {
-                itemId: items[i].id,
-                encodedItem: encodedItem,
-            };
-
-            await Cache.create(itemObj);
-
-            let job = createJob(items[i], ebayItem);
-
-            if (job) {
-                console.log(job, items[i].id);
-            }
-
-            // handle job creation
-        } else {
-            if (cacheItem.encodedItem !== encodedItem) {
-                let job = createJob(items[i], ebayItem);
-
-                if (job) {
-                    console.log(job, items[i].id);
-
-                    cacheItem.encodedItem = encodedItem;
-
-                    await cacheItem.save();
-                }
-            }
-        }
-    }
-
-    await setLastChecked();
+    return item && item.status && item.status === 'active' && item.listingId && item.listingId.length;
 }
 
 function createJob(item, ebayItem) {
     if (isItemActive(item) && !isItemSuppressed(item) && !isEbayItemActive(ebayItem) && itemHasPhotos(item)) {
-        queue.addItemQueue.add({ itemId: item.id });
-
-        return 'add';
+        return { type: 'add', itemId: item.id };
     }
 
     if (!isItemActive(item) && isEbayItemActive(ebayItem)) {
-        queue.removeItemQueue.add({ itemId: item.id });
-        return 'remove';
+       return { type: 'remove', itemId: item.id };
     }
 
     if (isItemSuppressed(item) && isEbayItemActive(ebayItem)) {
-        queue.removeItemQueue.add({ itemId: item.id });
-        return 'remove';
+        return { type: 'remove', itemId: item.id };
     }
 
     if (isItemActive(item) && isEbayItemActive(ebayItem)) {
-        queue.updateItemQueue.add({ itemId: item.id });
-        return 'update';
+        return { type: 'update', itemId: item.id };
     }
 }
 
 async function getLatest() {
     const lastInventoryCheck = await getAsync('lastInventoryCheck');
+
     const { resp, data } = await axios.get(`${process.env.INVENTORY_API_URL}/inventory/new/${lastInventoryCheck}`);
 
     return data;

@@ -1,37 +1,18 @@
 const inventoryItem = require('../api/partner/inventoryItem');
 const offer = require('../api/partner/offer');
 const store = require('../store/item');
-const logger = require('../logger');
-const { handleError, handleApiError } = require('../errorHandler');
+const getOfferId = require('../store/getOfferId');
 
 async function handle(itemId) {
-    // try {
     //     await inventoryItem.remove(itemId);
-    // } catch (error) {
-    //     if (error.response.status === 404) {
-    //         logger.warn(`Item ${itemId} not found when trying to remove.`, { errors: error.response.data.errors });
-    //     } else {
-    //         handleApiError(`Could not remove inventory item ${itemId}`, error);
-    //     }
-    // }
 
-    const offerId = await store.getOfferId(itemId);
+    let offerId = await getOfferId(itemId);
 
     if (!offerId) {
-        logger.warn(`No offerId found for item ${itemId}`);
-    } else {
-        try {
-            await offer.withdraw(offerId);
-        } catch (error) {
-            if (error.response.status === 404) {
-                logger.warn(`Offer ${offerId} for item ${itemId} not found when trying to withdraw.`, { errors: error.response.data.errors });
-            } else {
-                handleApiError(`Could not withdraw offer ${offerId} for item ${itemId}`, error);
-            }
-        }
+        throw new Error(`No offerId found for item ${itemId}`);
     }
 
-    // only set to inactive if we deleted inventory item AND offer
+    await offer.withdraw(offerId);
     await store.update(itemId, { status: 'inactive' });
 }
 

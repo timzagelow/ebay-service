@@ -20,13 +20,17 @@ async function update(itemId, payload = {}) {
 async function getOfferId(itemId) {
     const item = await Item.findOne({ itemId: itemId }, 'offerId');
 
-    return item.offerId;
+    if (item && item.offerId) {
+        return item.offerId;
+    }
 }
 
 async function getListingId(itemId) {
     const item = await Item.findOne({ itemId: itemId }, 'listingId');
 
-    return item.listingId;
+    if (item && item.listingId) {
+        return item.listingId;
+    }
 }
 
 module.exports = { update, getOfferId, getListingId };

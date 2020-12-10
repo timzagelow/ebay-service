@@ -1,23 +1,37 @@
 const logger = require('./logger');
 const slack = require('./slack');
+const JobError = require('./models/JobError');
 
-function handleApiError(msg, error) {
-    let code = error.response.status;
+function handleError(msg, error) {
+    if (error.response && error.response.status && error.response.data.errors) {
+        logger.error(msg, { code: code, error: error.response.data.errors });
 
-    logger.error(msg, { code: code, errors: error.response.data.errors });
+        JobError.create({
+            message: msg,
+            error: error.response.data.errors,
+        });
 
-    slack('eBay Service Error', msg);
+    } else {
+        if (error.message) {
+            logger.error(msg, { error: error.message });
 
-    throw Error(msg);
+            JobError.create({
+                message: msg,
+                error: error.message,
+            });
+
+        } else {
+            logger.error(msg);
+
+            JobError.create({
+                message: msg,
+                error: error,
+            });
+        }
+    }
+
+    // slack('eBay Service Error', msg);
 }
 
-function handleError(msg) {
-    logger.error(msg);
-
-    slack('eBay Service Error', msg);
-
-    throw Error(msg);
-}
-
-module.exports = { handleError, handleApiError };
+module.exports = { handleError };
 

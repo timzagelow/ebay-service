@@ -4,38 +4,32 @@ const internalItem = require('../api/internal/item');
 const inventoryItem = require('../api/partner/inventoryItem');
 const buildInventoryItem = require('../builders/inventoryItem');
 const offerBuilder = require('../builders/offer');
-const { handleApiError, handleError } = require('../errorHandler');
+const getOfferId = require('../store/getOfferId');
 
 async function handle(itemId) {
     const itemData = await internalItem.fetch(itemId);
 
     if (!itemData) {
-        handleError(`Could not fetch item ${itemId}`);
+        throw new Error(`Could not fetch item ${itemId} for update`);
     }
 
-    try {
-        const payload = await buildInventoryItem(itemData);
+    const listingId = await store.getListingId(itemId);
 
-        await inventoryItem.add(itemId, payload);
-    } catch (error) {
-        handleApiError(`Could not update item ${itemId}`, error);
+    if (!listingId) {
+        throw new Error(`No listingId exists for ${itemId} to update`);
     }
 
-    const offerId = await store.getOfferId(itemId);
+    const payload = await buildInventoryItem(itemData);
+    await inventoryItem.add(itemId, payload);
+    const offerId = await getOfferId(itemId);
 
     if (!offerId) {
-        handleApiError(`Can't update because no offer exists for item ${itemId}.`);
+        throw new Error(`No offerId found for item ${itemId}`);
     }
 
     const offerPayload = await offerBuilder(itemId, itemData);
 
-    try {
-        await offer.update(offerId, offerPayload);
-    } catch (error) {
-        handleError(`Could not update offer ${offerId} for item ${itemId}`, error);
-    }
-
-    // await store.update(itemId, { status: 'active' });
+    await offer.update(offerId, offerPayload);
 }
 
 module.exports = handle;

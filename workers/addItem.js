@@ -3,7 +3,6 @@ const internalItem = require('../api/internal/item');
 const inventoryItem = require('../api/partner/inventoryItem');
 const buildInventoryItem = require('../builders/inventoryItem');
 const DbItem = require('../models/Item');
-const { handleApiError, handleError } = require('../errorHandler');
 const buildPayload = require('../builders/offer');
 
 async function handle(itemId) {
@@ -19,36 +18,39 @@ async function handle(itemId) {
         });
     }
 
+    if (existing && existing.listingId) {
+        throw new Error(`${itemId} already exists. Not adding.`);
+    }
+
     const itemData = await internalItem.fetch(itemId);
+    const payload = await buildInventoryItem(itemData);
+    await inventoryItem.add(itemId, payload);
+    const existingOfferId = await getOfferId(itemId);
 
-    try {
-        const payload = await buildInventoryItem(itemData);
-
-        await inventoryItem.add(itemId, payload);
-    } catch (error) {
-        handleApiError(`Could not create item ${itemId}`, error);
+    if (existingOfferId) {
+        dbItem.offerId = existingOfferId;
     }
 
-    try {
-        if (dbItem.offerId) {
-            await offer.update(dbItem.offerId, buildPayload(itemId, itemData));
-        } else {
-            dbItem.offerId = await offer.create(itemId, itemData);
-            await dbItem.save();
-        }
-    } catch (error) {
-        handleApiError(`Could not create/update offer for item ${itemId}`, error)
+    if (dbItem.offerId) {
+        await offer.update(dbItem.offerId, buildPayload(itemId, itemData));
+    } else {
+        dbItem.offerId = await offer.create(itemId, itemData);
+        await dbItem.save();
     }
 
-    try {
-        dbItem.listingId = await offer.publish(dbItem.offerId);
-    } catch (error) {
-        handleApiError(`Could not publish offer ${dbItem.offerId} for item ${itemId}`, error);
-    }
+    dbItem.listingId = await offer.publish(dbItem.offerId);
 
     dbItem.status = 'active';
 
     return await dbItem.save();
+}
+
+async function getOfferId(itemId) {
+    const offers = await offer.getAll(itemId);
+
+    if (offers && offers.length) {
+        return offers[0].offerId;
+    }
 }
 
 module.exports = handle;

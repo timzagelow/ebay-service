@@ -19,14 +19,11 @@
     "dotenv": "^8.2.0",
     "handlebars": "^4.7.6",
     "moment": "^2.29.1",
-    "mongoose": "^5.11.2",
-    "mustache": "^4.0.1",
+    "mongoose": "^5.11.6",
+    "mustache": "^4.1.0",
     "qs": "^6.9.4",
     "redis": "^3.0.2",
     "slack-notify": "^0.1.7",
     "winston": "^3.3.3"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.6"
   }
 }
