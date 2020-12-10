@@ -7,6 +7,6 @@ const jobErrorSchema = new Schema({
     date: { type: Date, default: Date.now },
 }, { timestamps: true });
 
-const JobError = mongoose.model('JobError', jobErrorSchema);
+const JobError = mongoose.model('job_error', jobErrorSchema);
 
 module.exports = JobError;

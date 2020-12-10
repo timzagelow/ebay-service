@@ -1,5 +1,6 @@
 const buildCache = require('../workers/buildCache');
 const db = require('../db');
+const { handleError } = require('../errorHandler');
 
 module.exports = async function(job) {
     await db.load();
@@ -7,7 +8,8 @@ module.exports = async function(job) {
     try {
         return await buildCache();
     } catch (error) {
-        console.log(error);
-        throw new Error(error.message);
+        handleError('Error building cache', error);
     }
+
+    return 'done';
 };

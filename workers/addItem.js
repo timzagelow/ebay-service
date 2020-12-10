@@ -18,7 +18,7 @@ async function handle(itemId) {
         });
     }
 
-    if (existing && existing.listingId) {
+    if (existing && existing.listingId && existing.status === 'active') {
         throw new Error(`${itemId} already exists. Not adding.`);
     }
 
@@ -32,7 +32,10 @@ async function handle(itemId) {
     }
 
     if (dbItem.offerId) {
-        await offer.update(dbItem.offerId, buildPayload(itemId, itemData));
+        const offerPayload = await buildPayload(itemId, itemData);
+        console.dir(offerPayload, { depth: null });
+
+        await offer.update(dbItem.offerId, offerPayload);
     } else {
         dbItem.offerId = await offer.create(itemId, itemData);
         await dbItem.save();

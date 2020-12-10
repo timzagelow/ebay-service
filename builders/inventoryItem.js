@@ -39,8 +39,7 @@ function build(item) {
         aspects['Sleeve Grading'] = builder.condition('cover');
     }
 
-    // let imageUrls = builder.imageUrls();
-    let imageUrls = [ 'https://www.recordsbymail.com/transparent-glowing-logo.png' ];
+    let imageUrls = builder.imageUrls();
 
     return {
         availability: {

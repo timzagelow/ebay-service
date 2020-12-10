@@ -13,6 +13,7 @@ const queue = require('../queue');
 async function buildCache() {
     const items = await getLatest();
 
+    console.log(`checking for inventory changes`);
     console.log(`${items.length} items to check against cache`);
 
     let jobs = [];
@@ -53,7 +54,9 @@ async function buildCache() {
         }
     }
 
-    queue.itemQueue.add({ jobs: jobs });
+    if (jobs.length) {
+        queue.itemQueue.add({jobs: jobs});
+    }
 
     // await setLastChecked();
 }

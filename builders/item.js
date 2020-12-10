@@ -117,8 +117,18 @@ module.exports = class build {
 
     static imageUrls() {
         return build.item.images.map(image => {
-            return `${process.env.INVENTORY_IMAGE_PATH}/${image.url}`;
-        })
+            if (image.url) {
+                return `${process.env.ITEM_IMAGE_PATH}/${image.url}`;
+            }
+        });
+    }
+
+    static clipUrls() {
+        return build.item.soundclips.map(clip => {
+            if (clip.url) {
+                return `${process.env.ITEM_CLIP_PATH}/${clip.url}`;
+            }
+        });
     }
 
     static notes() {

@@ -19,7 +19,7 @@ async function build(item) {
         pressing: builder.pressing(),
         attributes: item.attributes.join(', '),
         additions: item.additions.join(', '),
-        clips: item.soundclips,
+        clips: builder.clipUrls(),
     };
 
     const templateStr = await fs.readFileSync(path.resolve(__dirname, "../templates/description.html")).toString();
