@@ -3,7 +3,7 @@ const logger = require('../../logger');
 
 async function fetch(itemId) {
     try {
-        const item = await axios.get(`${process.env.INVENTORY_API_URL}/inventory/${itemId}`);
+        const item = await axios.get(`${process.env.INVENTORY_API_URL}/${itemId}`);
 
         return item.data;
     } catch (err) {

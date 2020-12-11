@@ -55,10 +55,10 @@ async function buildCache() {
     }
 
     if (jobs.length) {
-        queue.itemQueue.add({jobs: jobs});
+        queue.itemQueue.add({ jobs: jobs });
     }
 
-    // await setLastChecked();
+    await setLastChecked();
 }
 
 function buildItemObject(item) {
@@ -123,7 +123,7 @@ function createJob(item, ebayItem) {
 async function getLatest() {
     const lastInventoryCheck = await getAsync('lastInventoryCheck');
 
-    const { resp, data } = await axios.get(`${process.env.INVENTORY_API_URL}/inventory/new/${lastInventoryCheck}`);
+    const { resp, data } = await axios.get(`${process.env.INVENTORY_API_URL}/new/${lastInventoryCheck}`);
 
     return data;
 }
