@@ -33,7 +33,6 @@ async function handle(itemId) {
 
     if (dbItem.offerId) {
         const offerPayload = await buildPayload(itemId, itemData);
-        console.dir(offerPayload, { depth: null });
 
         await offer.update(dbItem.offerId, offerPayload);
     } else {

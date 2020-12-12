@@ -3,7 +3,7 @@ const logger = require('../../logger');
 
 async function create(orderData) {
     try {
-        const order = await axios.post(`${process.env.ORDERS_API_URL}/orders`, orderData);
+        const order = await axios.post(`${process.env.ORDERS_API_URL}`, orderData);
 
         return order.data;
     } catch (err) {
@@ -15,7 +15,7 @@ async function create(orderData) {
 
 async function fetch(orderId) {
     try {
-        const order = await axios.get(`${process.env.ORDERS_API_URL}/orders/${orderId}`);
+        const order = await axios.get(`${process.env.ORDERS_API_URL}/${orderId}`);
 
         return order.data;
     } catch (err) {

@@ -2,9 +2,13 @@ const axios = require('axios');
 const buildPayload = require('../../builders/offer');
 
 async function getAll(itemId) {
-    const { data } = await axios.get(`${process.env.EBAY_API_URL}/sell/inventory/v1/offer?sku=${itemId}&marketplace_id=${process.env.EBAY_MARKETPLACE_ID}`);
+    try {
+        const {data} = await axios.get(`${process.env.EBAY_API_URL}/sell/inventory/v1/offer?sku=${itemId}&marketplace_id=${process.env.EBAY_MARKETPLACE_ID}`);
 
-    return data.offers;
+        return data.offers;
+    } catch (error) {
+        return [];
+    }
 }
 
 

@@ -1,5 +1,4 @@
 const logger = require('./logger');
-const slack = require('./slack');
 const JobError = require('./models/JobError');
 
 function handleError(msg, error) {
@@ -29,8 +28,6 @@ function handleError(msg, error) {
             });
         }
     }
-
-    // slack('eBay Service Error', msg);
 }
 
 module.exports = { handleError };

@@ -132,11 +132,15 @@ module.exports = class build {
     }
 
     static notes() {
-        return build.item.notes.map(note => {
+        let notes = [];
+
+        build.item.notes.forEach(note => {
             if (!note.type) {
-                return note.text;
+                notes.push(note.text);
             }
         });
+
+        return notes;
     }
 
     static mediaTexts() {
