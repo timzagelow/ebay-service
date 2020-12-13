@@ -60,7 +60,9 @@ async function buildCustomer(shipTo, address) {
         if (isNewAddress(orderAddress, existing)) {
             existing.address.push(orderAddress);
 
-            return await internalCustomer.update(existing.id, { address: existing.address });
+            await internalCustomer.update(existing.id, { address: existing.address });
+
+            existing.address = [ orderAddress ]; // only use the current address on the order
         }
 
         return existing;
