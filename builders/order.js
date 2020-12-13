@@ -1,6 +1,8 @@
 const fetchItem = require('../api/internal/item').fetch;
 const shippingOptions = require('../static/shippingOptions');
 const paymentMethods = require('../static/paymentMethods');
+const internalCustomer = require('../api/internal/customer');
+const _ = require('lodash');
 
 async function build(data) {
     let fulfillment = data.fulfillmentStartInstructions[0];
@@ -9,19 +11,8 @@ async function build(data) {
     let address = shipTo.contactAddress;
     let items = data.lineItems;
 
+
     let payload = {
-        customer: {
-            fullName: shipTo.fullName,
-            company: shipTo.companyName,
-            address1: address.addressLine1,
-            address2: address.addressLine2,
-            city: address.city,
-            state: address.stateOrProvince,
-            zip: address.postalCode,
-            country: address.countryCode,
-            phone: shipTo.primaryPhone ? shipTo.primaryPhone.phoneNumber : '',
-            email: address.email,
-        },
         platform: {
             site: 'eBay',
             orderId: data.orderId,
@@ -35,6 +26,7 @@ async function build(data) {
         }
     };
 
+    payload.customer = await buildCustomer(shipTo, address);
     payload.items = await handleItems(items);
 
     if (data.orderPaymentStatus === process.env.EBAY_PAID_ORDER_PAYMENT_STATUS) {
@@ -43,6 +35,59 @@ async function build(data) {
     }
 
     return payload;
+}
+
+async function buildCustomer(shipTo, address) {
+    const existing = await internalCustomer.fetchByEmail(address.email);
+    const orderAddress = {
+        company: shipTo.companyName,
+        line1: address.addressLine1,
+        line2: address.addressLine2,
+        city: address.city,
+        state: address.stateOrProvince,
+        zip: address.postalCode,
+        country: address.countryCode,
+    };
+
+    if (!existing) {
+        return await internalCustomer.create({
+            fullName: shipTo.fullName,
+            address: [ orderAddress ],
+            phone: [ shipTo.primaryPhone ? shipTo.primaryPhone.phoneNumber : '' ],
+            email: [ address.email ],
+        });
+    } else {
+        if (isNewAddress(orderAddress, existing)) {
+            existing.address.push(orderAddress);
+
+            return await internalCustomer.update(existing.id, { address: existing.address });
+        }
+
+        return existing;
+    }
+}
+
+function isNewAddress(orderAddress, existing) {
+    let isNewAddress = false;
+
+    for (let i = 0; i < existing.address.length; i++) {
+        const e = existing.address[i];
+        let existingAddress = {
+            company: e.company,
+            line1: e.line1,
+            line2: e.line2,
+            city: e.city,
+            state: e.state,
+            zip: e.zip,
+            country: e.country,
+        };
+
+        if (!_.isEqual(orderAddress, existingAddress)) {
+            isNewAddress = true;
+        }
+    }
+
+    return isNewAddress;
 }
 
 async function handleItems(items) {
