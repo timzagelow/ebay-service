@@ -1,5 +1,7 @@
 const { createLogger, format, transports } = require('winston');
 const { combine, splat, timestamp, printf } = format;
+const NODE_ENV = process.env.NODE_ENV || 'development';
+const CloudWatchTransport = require('winston-aws-cloudwatch');
 
 const myFormat = printf( ({ level, message, timestamp , ...metadata}) => {
     let msg = `${timestamp} [${level}] : ${message} `;
@@ -11,19 +13,42 @@ const myFormat = printf( ({ level, message, timestamp , ...metadata}) => {
     return msg;
 });
 
-const logger = createLogger({
+const consoleConfig = {
     format: combine(
         format.colorize(),
         splat(),
         timestamp(),
         myFormat
     ),
-    transports: [new transports.Console()]
-});
+};
+
+const cloudWatchConfig = {
+    logGroupName: process.env.CLOUDWATCH_LOG_GROUP,
+    logStreamName: NODE_ENV,
+    createLogGroup: false,
+    createLogStream: true,
+    awsConfig: {
+        accessKeyId: process.env.CLOUDWATCH_ACCESS_KEY_ID,
+        secretAccessKey: process.env.CLOUDWATCH_SECRET_ACCESS_KEY,
+        region: process.env.CLOUDWATCH_REGION
+    },
+};
+
+const logger = createLogger({
+    transports: [
+        new transports.Console(consoleConfig)
+]});
+
+if (NODE_ENV === 'production') {
+    logger.add(new CloudWatchTransport(cloudWatchConfig));
+}
+
+logger.level = process.env.LOG_LEVEL || "silly";
+
+logger.stream = {
+    write: function(message, encoding) {
+        logger.info(message);
+    }
+};
 
 module.exports = logger;
-
-//
-// logger.info('hey now!', { errors: [ { blah: 'blah' }]});
-//
-// logger.error('testing', { errors: 'errors' });
