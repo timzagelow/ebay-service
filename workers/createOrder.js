@@ -1,4 +1,5 @@
 const orderBuilder = require('../builders/order');
+const orderItem = require('../api/internal/orderItem');
 const ProcessedOrder = require('../models/ProcessedOrder');
 const internalOrder = require('../api/internal/order');
 const { handleApiError, handleError } = require('../errorHandler');
@@ -11,6 +12,8 @@ async function create(order) {
         try {
             const payload = await orderBuilder(order);
             const created = await internalOrder.create(payload);
+
+            const items = await orderItem.createMany(order);
 
             return await ProcessedOrder.create({
                 orderId: created.id,
