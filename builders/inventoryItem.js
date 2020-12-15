@@ -12,7 +12,7 @@ function build(item, listingId) {
     let aspects = {
         Artist: [ builder.artist() ],
         Duration: [ builder.duration() ], // LP, EP, Single, Double LP, Box Set
-        'Record Label': [ item.label.name ],
+        'Record Label': [ item.release.label.name ],
         Genre: [ builder.genre() ],
         Speed: [ builder.speed() ], // 33, 45, 78
         'Record Size': [ builder.size() ],
@@ -24,8 +24,8 @@ function build(item, listingId) {
         aspects['Style'] = builder.style();
     }
 
-    if (item.attributes.length) {
-        aspects['Special Attributes'] = item.attributes;
+    if (builder.listing.attributes.length) {
+        aspects['Special Attributes'] = builder.listing.attributes;
     }
 
     if (builder.releaseYear()) {
@@ -37,7 +37,7 @@ function build(item, listingId) {
     }
 
     if (builder.condition('cover')) {
-        aspects['Sleeve Grading'] = builder.condition('cover');
+        aspects['Sleeve Grading'] = [ builder.condition('cover') ];
     }
 
     let imageUrls = builder.imageUrls();

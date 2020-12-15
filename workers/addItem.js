@@ -37,7 +37,7 @@ async function handle(itemId, listingId) {
 
         await offer.update(dbItem.offerId, offerPayload);
     } else {
-        dbItem.offerId = await offer.create(listingId, itemData);
+        dbItem.offerId = await offer.create(itemId, itemData, listingId);
         await dbItem.save();
     }
 

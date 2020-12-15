@@ -13,7 +13,7 @@ async function handle(itemId, listingId) {
         throw new Error(`Could not fetch item ${itemId} for update`);
     }
 
-    const ebayListingId = await store.getEbayListingId(listingId);
+    const ebayListingId = await store.getEbayListingId(itemId, listingId);
 
     if (!ebayListingId) {
         throw new Error(`No eBay listingId exists for ${itemId}, ${listingId} to update`);

@@ -3,7 +3,7 @@ const { Schema } = mongoose;
 
 const itemSchema = new Schema({
     itemId: Number,
-    listingId: Number,
+    listingId: String,
     ebayListingId: Number,
     ebayOfferId: Number,
     status: String,

@@ -3,6 +3,7 @@ const buildItem = require('./item');
 
 async function buildPayload(itemId, itemData, listingId) {
     buildItem.item = itemData;
+    buildItem.listing = buildItem.getListing(listingId);
 
     return {
         categoryId: process.env.EBAY_RECORDS_CATEGORY_ID,
@@ -14,12 +15,12 @@ async function buildPayload(itemId, itemData, listingId) {
             fulfillmentPolicyId: process.env.EBAY_FULFILLMENT_POLICY_ID,
         },
         marketplaceId: process.env.EBAY_MARKETPLACE_ID,
-        sku: itemId.toString(),
+        sku: listingId,
         merchantLocationKey: 'warehouse',
         pricingSummary: {
             price: {
                 currency: "USD",
-                value: itemData.price.toString()
+                value: buildItem.listing.price.toString()
             }
         },
         listingDescription: await buildDescription(itemData),

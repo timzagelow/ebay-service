@@ -5,8 +5,8 @@ function build(item) {
 
     let title = `${itemBuilder.artist()}: ${itemBuilder.title()}`;
 
-    if ((title.length + item.label.name.length) <= process.env.EBAY_TITLE_MAX_LENGTH) {
-        title += ` ${item.label.name}`;
+    if ((title.length + item.release.label.name.length) <= process.env.EBAY_TITLE_MAX_LENGTH) {
+        title += ` ${item.release.label.name}`;
     }
 
     if ((title.length + itemBuilder.size().length) <= process.env.EBAY_TITLE_MAX_LENGTH) {

@@ -193,9 +193,9 @@
                 <p><strong>Label:</strong> {{ label }} {{ catalogNo }}</p>
                 <p><strong>Format:</strong> {{ format }}</p>
                 {{#each condition}}
-                <p><strong>{{ this.type }} Condition:</strong> {{ this.name }}
-                    {{#if this.text}}
-                    <span>{{ this.text}}</span>
+                <p><strong>{{ this.type }} Condition:</strong> {{ this.grade }}
+                    {{#if this.notes}}
+                    <span>{{ this.notes}}</span>
                     {{/if}}</p>
                 {{/each}}
                 <p><strong>Genre:</strong> {{ genre }}</p>

@@ -12,6 +12,7 @@ function handleError(msg, error) {
 
     } else {
         if (error.message) {
+            console.log(error);
             logger.error(msg, { error: error.message });
 
             JobError.create({

@@ -26,38 +26,36 @@ module.exports = class build {
 
     static conditions() {
         return build.listing.condition.map(c => {
-            if (c.type && c.type.length) {
                 return {
-                    name: c.name,
-                    type: c.type.charAt(0).toUpperCase() + c.type.slice(1),
-                    text: c.text.join(', '),
+                    grade: c.grade,
+                    type: c.type ? c.type.charAt(0).toUpperCase() + c.type.slice(1) : '',
+                    notes: c.notes.join(', '),
                 }
-            }
         });
     }
 
     static artist() {
-        if (build.item.artist.first) {
-            return [ build.item.artist.first, build.item.artist.last ].join(' ');
+        if (build.item.release.artist.first) {
+            return [ build.item.release.artist.first, build.item.release.artist.last ].join(' ');
         }
 
-        return build.item.artist.last;
+        return build.item.release.artist.last;
     }
 
     static title() {
-        return build.item.titles.join(' / ');
+        return build.item.release.titles.join(' / ');
     }
 
     static duration() {
-        if (build.item.media) {
-            return build.item.media[0].duration;
+        if (build.item.release.media) {
+            return build.item.release.media[0].duration;
         }
     }
 
     static genre() {
         let itemGenre;
 
-        build.item.genres.forEach(genre => {
+        build.item.release.genres.forEach(genre => {
             if (!genre.type && genre.name) {
                 itemGenre = genre.name;
             }
@@ -67,12 +65,12 @@ module.exports = class build {
     }
 
     static genres() {
-        return build.item.genres.map(genre => genre.name);
+        return build.item.release.genres.map(genre => genre.name);
     }
 
     static style() {
-        for (let i in build.item.genres) {
-            let genre = build.item.genres[i];
+        for (let i in build.item.release.genres) {
+            let genre = build.item.release.genres[i];
 
             if (genre.type && genre.type === 'style' && genre.name) {
                 return genre.name;
@@ -81,25 +79,25 @@ module.exports = class build {
     }
 
     static speed() {
-        if (build.item.media) {
-            return `${build.item.media[0].speed} RPM`;
+        if (build.item.release.media) {
+            return `${build.item.release.media[0].speed} RPM`;
         }
     }
 
     static size() {
-        if (build.item.media.length) {
-            return `${build.item.media[0].size}"`;
+        if (build.item.release.media.length) {
+            return `${build.item.release.media[0].size}"`;
         }
     }
 
     static releaseYear() {
-        const obj = build.item.pressing.find(p => p.type === 'releaseYear');
+        const obj = build.item.release.pressing.find(p => p.type === 'releaseYear');
 
         return obj && obj.text ? obj.text : '';
     }
 
     static edition() {
-        return build.item.pressing.filter(pressing => {
+        return build.item.release.pressing.filter(pressing => {
             if (pressing.type === 'edition') {
                 return pressing.text;
             }
@@ -109,7 +107,7 @@ module.exports = class build {
     static pressing() {
         let pressings = {};
 
-        build.item.pressing.forEach(p => {
+        build.item.release.pressing.forEach(p => {
             let type = p.type.charAt(0).toUpperCase() + p.type.slice(1);
 
             if (!pressings[type]) {
@@ -157,7 +155,7 @@ module.exports = class build {
     }
 
     static mediaTexts() {
-        return build.item.media.map(item => {
+        return build.item.release.media.map(item => {
             let countStr = item.count > 1 ? `${item.count} x ` : ``;
 
             return `${countStr}${item.size}" ${item.duration} (${item.speed} RPM)`;
