@@ -2,12 +2,13 @@ const conditions = require('../static/conditions');
 const builder = require('../builders/item');
 const buildTitle = require('../builders/title');
 
-function build(item) {
+function build(item, listingId) {
     builder.item = item;
+    builder.listing = builder.getListing(listingId);
 
-    let itemQuantity = builder.availableQuantity();
+    let itemQuantity = builder.availableQuantity(listingId);
 
-    let condition = conditions[builder.condition()];
+    let condition = conditions[builder.condition(listingId)];
     let aspects = {
         Artist: [ builder.artist() ],
         Duration: [ builder.duration() ], // LP, EP, Single, Double LP, Box Set

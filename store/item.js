@@ -25,12 +25,12 @@ async function getOfferId(itemId) {
     }
 }
 
-async function getListingId(itemId) {
-    const item = await Item.findOne({ itemId: itemId }, 'listingId');
+async function getEbayListingId(itemId) {
+    const item = await Item.findOne({ itemId: itemId }, 'ebayListingId');
 
-    if (item && item.listingId) {
-        return item.listingId;
+    if (item && item.ebayListingId) {
+        return item.ebayListingId;
     }
 }
 
-module.exports = { update, getOfferId, getListingId };
+module.exports = { update, getOfferId, getEbayListingId };

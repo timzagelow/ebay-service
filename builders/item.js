@@ -1,24 +1,37 @@
 module.exports = class build {
     static item;
+    static listing;
 
-    static availableQuantity() {
-        const obj = build.item.quantity.find(q => q.type === 'active');
+    static getListing(listingId) {
+        let l = {};
 
-        return obj && obj.count ? obj.count: 0;
+        build.item.listing.forEach (listing => {
+            if (listing._id === listingId) {
+                l = listing;
+            }
+        });
+
+        return l;
     }
 
-    static condition(type = 'disc') {
-        const obj = build.item.condition.find(c => c.type === type);
+    static availableQuantity() {
+        return build.listing.count ? build.listing.count : 0;
+    }
 
-        return obj && obj.name ? obj.name : '';
+    static condition() {
+        const obj = build.listing.condition.find(c => !c.type);
+
+        return obj && obj.grade ? obj.grade : '';
     }
 
     static conditions() {
-        return build.item.condition.map(c => {
-            return {
-                name: c.name,
-                type: c.type.charAt(0).toUpperCase() + c.type.slice(1),
-                text: c.text.join(', '),
+        return build.listing.condition.map(c => {
+            if (c.type && c.type.length) {
+                return {
+                    name: c.name,
+                    type: c.type.charAt(0).toUpperCase() + c.type.slice(1),
+                    text: c.text.join(', '),
+                }
             }
         });
     }
@@ -116,7 +129,7 @@ module.exports = class build {
     }
 
     static imageUrls() {
-        return build.item.images.map(image => {
+        return build.listing.images.map(image => {
             if (image.url) {
                 return `${process.env.ITEM_IMAGE_PATH}/${image.url}`;
             }
@@ -124,7 +137,7 @@ module.exports = class build {
     }
 
     static clipUrls() {
-        return build.item.soundclips.map(clip => {
+        return build.listing.soundclips.map(clip => {
             if (clip.url) {
                 return `${process.env.ITEM_CLIP_PATH}/${clip.url}`;
             }

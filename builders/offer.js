@@ -1,7 +1,7 @@
 const buildDescription = require('./description');
 const buildItem = require('./item');
 
-async function buildPayload(itemId, itemData) {
+async function buildPayload(itemId, itemData, listingId) {
     buildItem.item = itemData;
 
     return {

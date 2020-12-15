@@ -16,12 +16,12 @@ async function buildCache() {
     console.log(`checking for inventory changes`);
     console.log(`${items.length} items to check against cache`);
 
-    let jobs = [];
+    let newJobs = [];
 
     for (let i = 0; i < items.length; i++) {
         let cacheItem = await Cache.findOne({ itemId: items[i].id });
         let encodedItem = buildItemObject(items[i]);
-        let ebayItem = await EbayItem.findOne({ itemId: items[i].id });
+        let ebayItems = await EbayItem.find({ itemId: items[i].id });
 
         if (!cacheItem) {
             console.log(`No cache found for item ${items[i].id}`);
@@ -34,22 +34,26 @@ async function buildCache() {
 
             await Cache.create(itemObj);
 
-            let job = createJob(items[i], ebayItem);
+            let jobs = getJobs(items[i], ebayItems);
 
-            if (job) {
-                jobs.push(job);
+            if (jobs.length) {
+                jobs.forEach(job => {
+                    newJobs.push(job);
+                });
             }
         } else {
             if (cacheItem.encodedItem !== encodedItem) {
-                let job = createJob(items[i], ebayItem);
+                let jobs = getJobs(items[i], ebayItems);
 
-                if (job) {
-                    jobs.push(job);
-
-                    cacheItem.encodedItem = encodedItem;
-
-                    await cacheItem.save();
+                if (jobs.length) {
+                    jobs.forEach(job => {
+                        newJobs.push(job);
+                    });
                 }
+
+                cacheItem.encodedItem = encodedItem;
+
+                await cacheItem.save();
             }
         }
     }
@@ -83,10 +87,21 @@ function isItemSuppressed(item) {
     return isSuppressed;
 }
 
-function isItemActive(item) {
+function isListingReady(listing, item) {
+    return listing.type === 'active' &&
+        listing.count > 0 &&
+        listing.images &&
+        listing.images.length;
+}
+
+function isListingActiveOnEbay(listing, ebayItems) {
     let isActive = false;
-    item.quantity.forEach(qty => {
-        if (qty.type === 'active' && qty.count > 0) {
+
+    ebayItems.forEach(ebayItem => {
+        if (ebayItem.status === 'active' &&
+            ebayItem.listingId === listing._id &&
+            ebayItem.ebayListingId &&
+            ebayItem.ebayListingId.length) {
             isActive = true;
         }
     });
@@ -94,30 +109,22 @@ function isItemActive(item) {
     return isActive;
 }
 
-function itemHasPhotos(item) {
-    return item.images && item.images.length > 0;
-}
+function getJobs(item, ebayItems) {
+    let jobs = [];
 
-function isEbayItemActive(item) {
-    return item && item.status && item.status === 'active' && item.listingId && item.listingId.length;
-}
+    item.listing.forEach(listing => {
+        if (!isItemSuppressed(item) && isListingReady(listing, item) && !isListingActiveOnEbay(listing, ebayItems)) {
+            jobs.push({ type: 'add', itemId: item.itemId, listingId: listing._id });
+        } else if (!isItemSuppressed(item) && isListingReady(listing, item) && isListingActiveOnEbay(listing, ebayItems)) {
+            job.push({ type: 'update', itemId: item.itemId, listingId: listing._id });
+        } else if (!isListingReady(listing, item) && isListingActiveOnEbay(listing, ebayItems)) {
+            jobs.push({ type: 'remove', itemId: item.itemId, listingId: listing._id });
+        } else if (isItemSuppressed(item) && isListingReady(listing, item) && isListingActiveOnEbay(listing, ebayItems)) {
+            jobs.push({ type: 'remove', itemId: item.itemId, listingId: listing._id });
+        }
+    });
 
-function createJob(item, ebayItem) {
-    if (isItemActive(item) && !isItemSuppressed(item) && !isEbayItemActive(ebayItem) && itemHasPhotos(item)) {
-        return { type: 'add', itemId: item.id };
-    }
-
-    if (!isItemActive(item) && isEbayItemActive(ebayItem)) {
-       return { type: 'remove', itemId: item.id };
-    }
-
-    if (isItemSuppressed(item) && isEbayItemActive(ebayItem)) {
-        return { type: 'remove', itemId: item.id };
-    }
-
-    if (isItemActive(item) && isEbayItemActive(ebayItem)) {
-        return { type: 'update', itemId: item.id };
-    }
+    return jobs;
 }
 
 async function getLatest() {

@@ -46,8 +46,8 @@ async function withdraw(offerId) {
     }
 }
 
-async function create(itemId, itemData) {
-    let params = await buildPayload(itemId, itemData);
+async function create(itemId, itemData, listingId) {
+    let params = await buildPayload(itemId, itemData, listingId);
 
 
     const { data } = await axios.post(`${process.env.EBAY_API_URL}/sell/inventory/v1/offer`, params);

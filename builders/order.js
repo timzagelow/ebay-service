@@ -53,43 +53,16 @@ async function buildCustomer(shipTo, address) {
         return await internalCustomer.create({
             fullName: shipTo.fullName,
             address: [ orderAddress ],
-            phone: [ shipTo.primaryPhone ? shipTo.primaryPhone.phoneNumber : '' ],
+            phone: [ { number: shipTo.primaryPhone ? shipTo.primaryPhone.phoneNumber : '' } ],
             email: [ address.email ],
         });
     } else {
-        if (isNewAddress(orderAddress, existing)) {
-            existing.address.push(orderAddress);
+        await internalCustomer.update(existing.id, { address: orderAddress });
 
-            await internalCustomer.update(existing.id, { address: existing.address });
-
-            existing.address = [ orderAddress ]; // only use the current address on the order
-        }
+        existing.address = orderAddress; // only use the current address on the order
 
         return existing;
     }
-}
-
-function isNewAddress(orderAddress, existing) {
-    let isNewAddress = false;
-
-    for (let i = 0; i < existing.address.length; i++) {
-        const e = existing.address[i];
-        let existingAddress = {
-            company: e.company,
-            line1: e.line1,
-            line2: e.line2,
-            city: e.city,
-            state: e.state,
-            zip: e.zip,
-            country: e.country,
-        };
-
-        if (!_.isEqual(orderAddress, existingAddress)) {
-            isNewAddress = true;
-        }
-    }
-
-    return isNewAddress;
 }
 
 async function handleItems(items) {

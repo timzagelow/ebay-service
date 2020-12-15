@@ -6,28 +6,28 @@ const buildInventoryItem = require('../builders/inventoryItem');
 const offerBuilder = require('../builders/offer');
 const getOfferId = require('../store/getOfferId');
 
-async function handle(itemId) {
+async function handle(itemId, listingId) {
     const itemData = await internalItem.fetch(itemId);
 
     if (!itemData) {
         throw new Error(`Could not fetch item ${itemId} for update`);
     }
 
-    const listingId = await store.getListingId(itemId);
+    const ebayListingId = await store.getEbayListingId(listingId);
 
-    if (!listingId) {
-        throw new Error(`No listingId exists for ${itemId} to update`);
+    if (!ebayListingId) {
+        throw new Error(`No eBay listingId exists for ${itemId}, ${listingId} to update`);
     }
 
-    const payload = await buildInventoryItem(itemData);
-    await inventoryItem.add(itemId, payload);
-    const offerId = await getOfferId(itemId);
+    const payload = await buildInventoryItem(itemData, listingId);
+    await inventoryItem.add(listingId, payload);
+    const offerId = await getOfferId(listingId);
 
     if (!offerId) {
-        throw new Error(`No offerId found for item ${itemId}`);
+        throw new Error(`No offerId found for item ${itemId}, ${listingId}`);
     }
 
-    const offerPayload = await offerBuilder(itemId, itemData);
+    const offerPayload = await offerBuilder(itemId, itemData, listingId);
 
     await offer.update(offerId, offerPayload);
 }

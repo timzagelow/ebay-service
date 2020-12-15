@@ -16,12 +16,12 @@ module.exports = async function(jobs) {
 
     jobs.data.jobs.forEach(async (job) => {
         if (job.type === 'add') {
-            console.log(`adding ${job.itemId}`);
+            console.log(`adding ${job.itemId}, ${job.listingId}`);
 
             try {
-                await addItem(job.itemId);
+                await addItem(job.itemId, job.listingId);
             } catch (error) {
-                handleError(`Error adding item ${job.itemId}`, error);
+                handleError(`Error adding item ${job.itemId}, ${job.listingId}`, error);
             }
         }
 
@@ -29,19 +29,19 @@ module.exports = async function(jobs) {
             console.log(`updating ${job.itemId}`);
 
             try {
-                await updateItem(job.itemId);
+                await updateItem(job.itemId, job.listingId);
             } catch (error) {
-                handleError(`Error updating item ${job.itemId}`, error);
+                handleError(`Error updating item ${job.itemId}, ${job.listingId}`, error);
             }
         }
 
         if (job.type === 'remove') {
-            console.log(`removing ${job.itemId}`);
+            console.log(`removing ${job.itemId}, ${job.listingId}`);
 
             try {
-                await removeItem(job.itemId);
+                await removeItem(job.itemId, job.listingId);
             } catch (error) {
-                handleError(`Error removing item ${job.itemId}`, error);
+                handleError(`Error removing item ${job.itemId}, ${job.listingId}`, error);
             }
         }
     });

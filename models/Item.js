@@ -4,7 +4,8 @@ const { Schema } = mongoose;
 const itemSchema = new Schema({
     itemId: Number,
     listingId: Number,
-    offerId: Number,
+    ebayListingId: Number,
+    ebayOfferId: Number,
     status: String,
     date: { type: Date, default: Date.now },
 }, { timestamps: true });
