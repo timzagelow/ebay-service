@@ -17,7 +17,6 @@ function build(item, listingId) {
         Speed: [ builder.speed() ], // 33, 45, 78
         'Record Size': [ builder.size() ],
         Title: [ builder.title() ],
-        'UPC': [ 'Does not apply' ],
     };
 
     if (builder.style()) {
@@ -59,8 +58,8 @@ function build(item, listingId) {
             aspects: aspects,
             imageUrls: imageUrls,
             title: buildTitle(item),
+            upc: [ 'Does not apply' ],
         },
-        upc: [ 'Does not apply' ],
     };
 }
 
