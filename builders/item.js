@@ -18,8 +18,14 @@ module.exports = class build {
         return build.listing.count ? build.listing.count : 0;
     }
 
+    static findCondition(subject) {
+        const obj = build.listing.condition.find(c => c.subject === subject);
+
+        return obj && obj.grade ? obj.grade : '';
+    }
+
     static condition() {
-        const obj = build.listing.condition.find(c => !c.type);
+        const obj = build.listing.condition.find(c => c.subject === 'item' || c.subject === 'disc');
 
         return obj && obj.grade ? obj.grade : '';
     }
@@ -28,7 +34,7 @@ module.exports = class build {
         return build.listing.condition.map(c => {
                 return {
                     grade: c.grade,
-                    type: c.type ? c.type.charAt(0).toUpperCase() + c.type.slice(1) : '',
+                    type: c.subject ? c.subject.charAt(0).toUpperCase() + c.subject.slice(1) : '',
                     notes: c.notes.join(', '),
                 }
         });

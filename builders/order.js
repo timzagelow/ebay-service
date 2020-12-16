@@ -2,7 +2,6 @@ const fetchItem = require('../api/internal/item').fetch;
 const shippingOptions = require('../static/shippingOptions');
 const paymentMethods = require('../static/paymentMethods');
 const internalCustomer = require('../api/internal/customer');
-const _ = require('lodash');
 
 async function build(data) {
     let fulfillment = data.fulfillmentStartInstructions[0];
@@ -59,7 +58,7 @@ async function buildCustomer(shipTo, address) {
     } else {
         await internalCustomer.update(existing.id, { address: orderAddress });
 
-        existing.address = orderAddress; // only use the current address on the order
+        existing.address = [ orderAddress ]; // only use the current address on the order
 
         return existing;
     }

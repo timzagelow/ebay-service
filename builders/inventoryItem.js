@@ -6,9 +6,9 @@ function build(item, listingId) {
     builder.item = item;
     builder.listing = builder.getListing(listingId);
 
-    let itemQuantity = builder.availableQuantity(listingId);
+    let itemQuantity = builder.availableQuantity();
 
-    let condition = conditions[builder.condition(listingId)];
+    let condition = conditions[builder.condition()];
     let aspects = {
         Artist: [ builder.artist() ],
         Duration: [ builder.duration() ], // LP, EP, Single, Double LP, Box Set
@@ -16,7 +16,6 @@ function build(item, listingId) {
         Genre: [ builder.genre() ],
         Speed: [ builder.speed() ], // 33, 45, 78
         'Record Size': [ builder.size() ],
-        'Record Grading': [ builder.condition() ],
         Title: [ builder.title() ],
     };
 
@@ -36,7 +35,13 @@ function build(item, listingId) {
         aspects['Edition'] = builder.edition();
     }
 
-    if (builder.condition('cover')) {
+    if (builder.findCondition('item')) {
+        aspects['Record Grading'] = [ builder.condition('item') ];
+    } else if (builder.findCondition('disc')) {
+        aspects['Record Grading'] = [ builder.condition('disc') ];
+    }
+
+    if (builder.findCondition('cover')) {
         aspects['Sleeve Grading'] = [ builder.condition('cover') ];
     }
 
