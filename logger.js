@@ -23,6 +23,34 @@ const consoleConfig = {
     ),
 };
 
+const slackFormatter = ({ level, message, timestamp , ...metadata}) => {
+    let fields = [];
+    fields.push({type: "mrkdwn", text: message});
+
+    if (metadata.length) {
+        fields.push({ type: "mrkdwn", text: JSON.stringify(metadata) });
+    }
+
+    return {
+        blocks: [
+            {
+                type: 'context',
+                elements: [{
+                    type: 'mrkdwn',
+                    text: `${process.env.APP_NAME} ${level}`,
+                }]
+            },
+            {
+                "type": "divider"
+            },
+            {
+                type: 'section',
+                fields: fields
+            },
+        ]
+    }
+};
+
 const cloudWatchConfig = {
     logGroupName: process.env.CLOUDWATCH_LOG_GROUP,
     logStreamName: NODE_ENV,
