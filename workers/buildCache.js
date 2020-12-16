@@ -57,8 +57,8 @@ async function buildCache() {
         }
     }
 
-    if (jobs.length) {
-        queue.itemQueue.add({ jobs: jobs });
+    if (newJobs.length) {
+        queue.itemQueue.add({ jobs: newJobs });
     }
 
     await setLastChecked();
