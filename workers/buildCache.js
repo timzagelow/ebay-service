@@ -61,6 +61,8 @@ async function buildCache() {
         queue.itemQueue.add({ jobs: newJobs });
     }
 
+    console.dir(newJobs, { depth: null });
+
     await setLastChecked();
 }
 
