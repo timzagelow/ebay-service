@@ -18,16 +18,16 @@ async function buildCache() {
     let newJobs = [];
 
     for (let i = 0; i < items.length; i++) {
-        let cacheItem = await Cache.findOne({ itemId: items[i].id });
+        let cacheItem = await Cache.findOne({ itemId: items[i].itemId });
         let encodedItem = buildItemObject(items[i]);
-        let ebayItems = await EbayItem.find({ itemId: items[i].id });
+        let ebayItems = await EbayItem.find({ itemId: items[i].itemId });
 
         if (!cacheItem) {
-            console.log(`No cache found for item ${items[i].id}`);
+            console.log(`No cache found for item ${items[i].itemId}`);
 
             // add to cache and determine if add job should be created
             const itemObj = {
-                itemId: items[i].id,
+                itemId: items[i].itemId,
                 encodedItem: encodedItem,
             };
 
