@@ -24,6 +24,7 @@
     "qs": "^6.9.4",
     "redis": "^3.0.2",
     "winston": "^3.3.3",
-    "winston-aws-cloudwatch": "^3.0.0"
+    "winston-aws-cloudwatch": "^3.0.0",
+    "winston-slack-webhook-transport": "^2.0.0"
   }
 }
