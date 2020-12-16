@@ -116,7 +116,7 @@ function getJobs(item, ebayItems) {
         if (!isItemSuppressed(item) && isListingReady(listing, item) && !isListingActiveOnEbay(listing, ebayItems)) {
             jobs.push({ type: 'add', itemId: item.itemId, listingId: listing._id });
         } else if (!isItemSuppressed(item) && isListingReady(listing, item) && isListingActiveOnEbay(listing, ebayItems)) {
-            job.push({ type: 'update', itemId: item.itemId, listingId: listing._id });
+            jobs.push({ type: 'update', itemId: item.itemId, listingId: listing._id });
         } else if (!isListingReady(listing, item) && isListingActiveOnEbay(listing, ebayItems)) {
             jobs.push({ type: 'remove', itemId: item.itemId, listingId: listing._id });
         } else if (isItemSuppressed(item) && isListingReady(listing, item) && isListingActiveOnEbay(listing, ebayItems)) {
