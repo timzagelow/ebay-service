@@ -59,7 +59,7 @@ function build(item, listingId) {
             imageUrls: imageUrls,
             title: buildTitle(item),
         },
-        upc: [ 'Does not apply' ],
+        // upc: [ 'Does not apply' ],
     };
 }
 
