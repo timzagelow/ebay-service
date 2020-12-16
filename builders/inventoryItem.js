@@ -1,4 +1,3 @@
-const conditions = require('../static/conditions');
 const builder = require('../builders/item');
 const buildTitle = require('../builders/title');
 
@@ -8,7 +7,8 @@ function build(item, listingId) {
 
     let itemQuantity = builder.availableQuantity();
 
-    let condition = conditions[builder.condition()];
+    let condition = builder.condition() === 'SS' ? process.env.EBAY_NEW_CONDITION_ID : process.env.EBAY_USED_CONDITION_ID;
+
     let aspects = {
         Artist: [ builder.artist() ],
         Duration: [ builder.duration() ], // LP, EP, Single, Double LP, Box Set

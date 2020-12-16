@@ -25,7 +25,7 @@ module.exports = class build {
     }
 
     static condition() {
-        const obj = build.listing.condition.find(c => c.subject === 'item' || c.subject === 'disc');
+        const obj = build.listing.condition.find(c => c.subject === 'item' || c.subject === 'disc' || !c.subject);
 
         return obj && obj.grade ? obj.grade : '';
     }
