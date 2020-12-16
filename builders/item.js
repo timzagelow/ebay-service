@@ -160,6 +160,10 @@ module.exports = class build {
         return notes;
     }
 
+    static mediaSize() {
+        return build.item.release.media[0].size === '12' ? 'large' : 'small';
+    }
+
     static mediaTexts() {
         return build.item.release.media.map(item => {
             let countStr = item.count > 1 ? `${item.count} x ` : ``;
