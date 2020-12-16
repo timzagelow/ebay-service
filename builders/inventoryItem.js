@@ -16,7 +16,7 @@ function build(item, listingId) {
         Genre: [ builder.genre() ],
         Speed: [ builder.speed() ], // 33, 45, 78
         'Record Size': [ builder.size() ],
-        Title: [ builder.title() ],
+        Title: [ builder.title().substring(0, process.env.EBAY_ASPECT_TITLE_MAX) ],
     };
 
     if (builder.style()) {
