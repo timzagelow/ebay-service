@@ -42,10 +42,10 @@ const logger = createLogger({
 
 if (NODE_ENV === 'production') {
     logger.add(new CloudWatchTransport(cloudWatchConfig));
-    new SlackHook({
+    logger.add(new SlackHook({
         webhookUrl: process.env.SLACK_WEBHOOK_URL,
         formatter: slackFormatter
-    })]
+    }));
 }
 
 logger.level = process.env.LOG_LEVEL || "silly";
