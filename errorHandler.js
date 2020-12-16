@@ -3,6 +3,8 @@ const JobError = require('./models/JobError');
 
 function handleError(msg, error) {
     if (error.response && error.response.status && error.response.data.errors) {
+        msg += ` - ${error.response.data.errors[0].message}`;
+
         logger.error(msg, { code: error.response.status, error: error.response.data.errors });
 
         JobError.create({
