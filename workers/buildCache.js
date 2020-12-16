@@ -42,6 +42,7 @@ async function buildCache() {
             }
         } else {
             if (cacheItem.encodedItem !== encodedItem) {
+                console.log('cache is different');
                 let jobs = getJobs(items[i], ebayItems);
 
                 if (jobs.length) {
@@ -99,8 +100,8 @@ function isListingActiveOnEbay(listing, ebayItems) {
     ebayItems.forEach(ebayItem => {
         if (ebayItem.status === 'active' &&
             ebayItem.listingId === listing._id &&
-            ebayItem.ebayListingId &&
-            ebayItem.ebayListingId.length) {
+            ebayItem.ebayListingId) {
+
             isActive = true;
         }
     });
