@@ -47,17 +47,20 @@ async function buildCustomer(shipTo, address) {
     };
 
     if (!existing) {
-        return await internalCustomer.create({
+        const customer = await internalCustomer.create({
             fullName: shipTo.fullName,
             address: [ orderAddress ],
             phone: [ { number: shipTo.primaryPhone ? shipTo.primaryPhone.phoneNumber : '' } ],
             email: [ shipTo.email ],
         });
-    } else {
 
+        customer.address = orderAddress;
+
+        return customer;
+    } else {
         await internalCustomer.update(existing.customerId, { address: orderAddress });
 
-        existing.address = [ orderAddress ]; // only use the current address on the order
+        existing.address = orderAddress; // only use the current address on the order
         console.dir(existing, { depth: null });
 
         return existing;
