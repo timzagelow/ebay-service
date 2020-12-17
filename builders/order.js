@@ -23,7 +23,7 @@ async function build(data) {
     };
 
     if (data.pricingSummary.tax) {
-        totals.tax = parseFloat(data.pricingSummary.tax.value);
+        payload.totals.tax = parseFloat(data.pricingSummary.tax.value);
     }
 
     payload.customer = await buildCustomer(shipTo, address);
