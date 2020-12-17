@@ -20,7 +20,7 @@ async function create(order) {
 
             if (order.orderPaymentStatus === process.env.EBAY_PAID_ORDER_PAYMENT_STATUS) {
                 orderData.payment = orderBuilder.handlePayments(order);
-                orderData.shipping = [ orderBuilder.handleShipping(order, order.items) ];
+                orderData.shipping = orderBuilder.handleShipping(order, order.items);
             }
 
             await internalOrder.update(orderId, orderData);

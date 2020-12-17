@@ -103,14 +103,16 @@ function handleShipping(data, items) {
 }
 
 function handlePayments(data) {
-    return data.paymentSummary.payments.map(payment => {
+    let payment = data.paymentSummary.payments[0];
+
+    // return data.paymentSummary.payments.map(payment => {
         return {
             amount: parseFloat(payment.amount.value),
             date: payment.paymentDate,
             method: paymentMethods[payment.paymentMethod] || payment.paymentMethod,
             transactionId: payment.paymentReferenceId,
         }
-    });
+    // });
 }
 
 function isMethodFirstClass(items) {
