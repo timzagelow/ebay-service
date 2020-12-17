@@ -62,7 +62,7 @@ async function buildCache() {
         queue.itemQueue.add({ jobs: newJobs });
     }
 
-    await setLastChecked();
+    return await setLastChecked();
 }
 
 function buildItemObject(item) {
