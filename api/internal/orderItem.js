@@ -19,6 +19,7 @@ async function createMany(orderId, order) {
             quantity: item.quantity,
             platform: getPlatformObject(item)
         };
+        console.dir(payload, { depth: null });
 
         try {
             const orderItem = await axios.post(`${process.env.ORDERS_API_URL}/${orderId}/item`, payload);
