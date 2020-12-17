@@ -1,4 +1,5 @@
 const DbItem = require('../../models/Item');
+const logger = require('../../logger');
 
 async function createMany(orderId, order) {
     let items = order.lineItems;
