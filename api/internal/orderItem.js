@@ -26,7 +26,7 @@ async function createMany(orderId, order) {
                 return orderItem.data;
             }
         } catch (err) {
-            logger.error(`Could not create the order item`, { error: err.response.data });
+            logger.error(`Could not create the order item`, { error: err });
             // throw Error;
         }
     }));
