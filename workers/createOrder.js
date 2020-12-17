@@ -8,7 +8,7 @@ const logger = require('../logger');
 async function create(order) {
     const existing = await ProcessedOrder.findOne({ ebayOrderId: order.orderId });
 
-    // if (!existing) {
+    if (!existing) {
         try {
             const payload = await orderBuilder.build(order);
             const created = await internalOrder.create(payload);
@@ -33,7 +33,7 @@ async function create(order) {
         } catch (error) {
             handleError(`Could not create eBay order ${order.orderId}`, error);
         }
-    // }
+    }
 
     // logger.warn(`Already processed order ${existing.orderId}`, existing._doc);
 }
