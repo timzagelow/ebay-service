@@ -8,19 +8,27 @@ const createOrder = require('./createOrder');
 const apiOrder = require('../api/partner/order');
 
 async function getOrders() {
-    const lastOrdersFetch = await getAsync('lastOrdersFetch');
+    try {
+        const lastOrdersFetch = await getAsync('lastOrdersFetch');
 
-    const orders = await apiOrder.fetchNew(lastOrdersFetch);
+        const orders = await apiOrder.fetchNew(lastOrdersFetch);
+        // return Promise.resolve();
 
-    orders.forEach(async order => {
-        await createOrder(order);
-    });
+        return await createOrder(orders[0]);
 
-    await setLastFetch();
+        //
+        // orders.forEach(async order => {
+        //     const processed = await createOrder(order);
+        //     console.log(processed);
+        // });
+        // await setLastFetch();
+    } catch (err) {
+        console.log(err.response.data)
+    }
 }
 
 async function setLastFetch() {
-    let date = moment().utc().toISOString();
+    let date = moment().toISOString();
     await setAsync('lastOrdersFetch', date);
 }
 

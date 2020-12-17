@@ -8,8 +8,6 @@ async function build(data) {
     let shipping = fulfillment.shippingStep;
     let shipTo = shipping.shipTo;
     let address = shipTo.contactAddress;
-    let items = data.lineItems;
-
 
     let payload = {
         platform: {
@@ -19,25 +17,25 @@ async function build(data) {
         },
         totals: {
             item: parseFloat(data.pricingSummary.priceSubtotal.value),
-            tax: parseFloat(data.pricingSummary.tax.value),
             shipping: parseFloat(data.pricingSummary.deliveryCost.value),
             total: parseFloat(data.pricingSummary.total.value),
         }
     };
 
-    payload.customer = await buildCustomer(shipTo, address);
-    payload.items = await handleItems(items);
-
-    if (data.orderPaymentStatus === process.env.EBAY_PAID_ORDER_PAYMENT_STATUS) {
-        payload.payment = handlePayments(data);
-        payload.shipping = [ handleShipping(data, payload.items) ];
+    if (data.pricingSummary.tax) {
+        totals.tax = parseFloat(data.pricingSummary.tax.value);
     }
+
+    payload.customer = await buildCustomer(shipTo, address);
+
+    console.dir(payload, { depth: null });
 
     return payload;
 }
 
 async function buildCustomer(shipTo, address) {
-    const existing = await internalCustomer.fetchByEmail(address.email);
+    const existing = await internalCustomer.fetchByEmail(shipTo.email);
+
     const orderAddress = {
         company: shipTo.companyName,
         line1: address.addressLine1,
@@ -53,12 +51,14 @@ async function buildCustomer(shipTo, address) {
             fullName: shipTo.fullName,
             address: [ orderAddress ],
             phone: [ { number: shipTo.primaryPhone ? shipTo.primaryPhone.phoneNumber : '' } ],
-            email: [ address.email ],
+            email: [ shipTo.email ],
         });
     } else {
-        await internalCustomer.update(existing.id, { address: orderAddress });
+
+        await internalCustomer.update(existing.customerId, { address: orderAddress });
 
         existing.address = [ orderAddress ]; // only use the current address on the order
+        console.dir(existing, { depth: null });
 
         return existing;
     }
@@ -92,9 +92,9 @@ async function handleItems(items) {
 function handleShipping(data, items) {
     let method = shippingOptions[data.fulfillmentStartInstructions[0].shippingStep.shippingServiceCode] || data.fulfillmentStartInstructions[0].shippingStep.shippingServiceCode;
 
-    if (isMethodFirstClass(items)) {
-        method = shippingOptions['USPSFirstClass'];
-    }
+    // if (isMethodFirstClass(items)) {
+    //     method = shippingOptions['USPSFirstClass'];
+    // }
 
     return {
         method: method,
@@ -117,7 +117,7 @@ function isMethodFirstClass(items) {
     let smallItemCount = 0;
 
     items.forEach(item => {
-        item.media.forEach(m => {
+        item.release.media.forEach(m => {
             if (m.size <= process.env.SMALL_ITEM_SIZE_MAX) {
                 smallItemCount += m.count;
             }
@@ -127,4 +127,4 @@ function isMethodFirstClass(items) {
     return smallItemCount <= process.env.FIRST_CLASS_SMALL_ITEM_MAX;
 }
 
-module.exports = build;
+module.exports = { build, handlePayments, handleShipping };

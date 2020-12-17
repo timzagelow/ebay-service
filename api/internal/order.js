@@ -25,4 +25,16 @@ async function fetch(orderId) {
     }
 }
 
-module.exports = { create, fetch };
+async function update(orderId, orderData) {
+    try {
+        const order = await axios.put(`${process.env.ORDERS_API_URL}/${orderId}`, orderData);
+
+        return order.data;
+    } catch (err) {
+        logger.error(`Could not update the order`, { error: err.response.data });
+
+        throw Error;
+    }
+}
+
+module.exports = { create, fetch, update };

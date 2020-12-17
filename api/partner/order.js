@@ -2,11 +2,13 @@ const axios = require('axios');
 const moment = require('moment');
 
 async function fetchNew(lastCheck) {
-    let date = moment(lastCheck).utc().toISOString();
+    let date = moment(lastCheck).toISOString();
 
     const { data } = await axios.get(`${process.env.EBAY_API_URL}/sell/fulfillment/v1/order?filter=creationdate:[${date}]`);
 
-    return data.orders;
+    if (data.orders) {
+        return data.orders;
+    }
 }
 
 async function fetch(orderId) {

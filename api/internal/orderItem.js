@@ -1,11 +1,11 @@
 const DbItem = require('../../models/Item');
 
-async function createMany(order) {
+async function createMany(orderId, order) {
     let items = order.lineItems;
 
     return await Promise.all(items.map(async item => {
         // get itemId from ItemDB
-        const dbItem = await DbItem.find({ listingId: item.sku });
+        const dbItem = await DbItem.findOne({ listingId: item.sku, status: 'active' });
 
         if (!dbItem) {
             throw new Error(`Could not find listingId for ${item.sku}`);
@@ -17,7 +17,17 @@ async function createMany(order) {
             quantity: item.quantity,
             platform: getPlatformObject(item)
         };
-        
+
+        try {
+            const orderItem = await axios.post(`${process.env.ORDERS_API_URL}/${orderId}/item`, payload);
+
+            if (orderItem && orderItem.data) {
+                return orderItem.data;
+            }
+        } catch (err) {
+            logger.error(`Could not create the order item`, { error: err.response.data });
+            // throw Error;
+        }
     }));
 }
 

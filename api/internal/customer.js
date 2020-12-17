@@ -15,7 +15,7 @@ async function create(customerData) {
 
 async function update(id, customerData) {
     try {
-        const customer = await axios.put(`${process.env.ORDERS_API_URL}/customers/{id}`, customerData);
+        const customer = await axios.put(`${process.env.ORDERS_API_URL}/customers/${id}`, customerData);
 
         return customer.data;
     } catch (err) {
@@ -29,9 +29,11 @@ async function fetchByEmail(email) {
     try {
         const customer = await axios.get(`${process.env.ORDERS_API_URL}/customers?email=${email}`);
 
-        return customer.data;
+        if (customer && customer.data) {
+            return customer.data;
+        }
     } catch (err) {
-        logger.error(`Could not fetch the customer`, { error: err.response.data });
+        logger.error(`Could not fetch the customer`, { error: err });
 
         throw Error;
     }
