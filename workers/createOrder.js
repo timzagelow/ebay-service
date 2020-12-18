@@ -11,6 +11,9 @@ async function create(order) {
     if (!existing) {
         try {
             const payload = await orderBuilder.build(order);
+            console.log(payload);
+            return;
+
             const created = await internalOrder.create(payload);
             let orderId = created.id;
 

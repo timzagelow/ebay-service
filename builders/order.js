@@ -22,6 +22,13 @@ async function build(data) {
         }
     };
 
+    if (data.buyerCheckoutNotes) {
+        payload.notes = {
+            text: data.buyerCheckoutNotes,
+            type: 'customer',
+        };
+    }
+
     if (data.pricingSummary.tax) {
         payload.totals.tax = parseFloat(data.pricingSummary.tax.value);
     }
