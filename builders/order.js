@@ -33,6 +33,11 @@ async function build(data) {
         payload.totals.tax = parseFloat(data.pricingSummary.tax.value);
     }
 
+    if (data.orderPaymentStatus === process.env.EBAY_PAID_ORDER_PAYMENT_STATUS) {
+        payload.payment = handlePayments(data);
+        payload.shipping = handleShipping(data);
+    }
+
     payload.customer = await buildCustomer(shipTo, address);
 
     console.dir(payload, { depth: null });

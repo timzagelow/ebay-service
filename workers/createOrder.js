@@ -11,7 +11,6 @@ async function create(order) {
     if (!existing) {
         try {
             const payload = await orderBuilder.build(order);
-            console.log(payload);
             return;
 
             const created = await internalOrder.create(payload);
@@ -21,10 +20,7 @@ async function create(order) {
 
             const orderData = {};
 
-            if (order.orderPaymentStatus === process.env.EBAY_PAID_ORDER_PAYMENT_STATUS) {
-                orderData.payment = orderBuilder.handlePayments(order);
-                orderData.shipping = orderBuilder.handleShipping(order, order.items);
-            }
+
 
             await internalOrder.update(orderId, orderData);
 
