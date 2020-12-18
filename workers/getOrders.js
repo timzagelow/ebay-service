@@ -13,13 +13,12 @@ async function getOrders() {
 
         const orders = await apiOrder.fetchNew(lastOrdersFetch);
 
-        await createOrder(orders[0]);
-        // orders.forEach(async order => {
-        //     const processed = await createOrder(order);
-        //     console.log(processed);
-        // });
+        // await createOrder(orders[0]);
+        orders.forEach(async order => {
+            await createOrder(order);
+        });
 
-        // await setLastFetch();
+        await setLastFetch();
     } catch (err) {
         console.log(err)
     }

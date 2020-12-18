@@ -25,9 +25,9 @@ async function create(order) {
         } catch (error) {
             handleError(`Could not create eBay order ${order.orderId}`, error);
         }
+    } else {
+        logger.info(`Already processed order ${existing.orderId}`, existing._doc);
     }
-
-    logger.info(`Already processed order ${existing.orderId}`, existing._doc);
 }
 
 module.exports = create;
