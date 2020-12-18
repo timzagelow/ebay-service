@@ -21,7 +21,7 @@ async function getOrders() {
 
         // await setLastFetch();
     } catch (err) {
-        console.log(err.response.data)
+        console.log(err)
     }
 }
 
