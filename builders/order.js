@@ -55,12 +55,14 @@ async function buildCustomer(shipTo, address) {
         });
 
         customer.address = orderAddress;
+        customer.email = shipTo.email;
 
         return customer;
     } else {
         await internalCustomer.update(existing.customerId, { address: orderAddress });
 
         existing.address = orderAddress; // only use the current address on the order
+        existing.email = shipTo.email;
         console.dir(existing, { depth: null });
 
         return existing;

@@ -23,6 +23,7 @@ function handleError(msg, error) {
             });
 
         } else {
+            logger.error(error);
             logger.error(msg);
 
             JobError.create({
