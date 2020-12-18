@@ -27,7 +27,7 @@ async function create(order) {
         }
     }
 
-    // logger.warn(`Already processed order ${existing.orderId}`, existing._doc);
+    logger.info(`Already processed order ${existing.orderId}`, existing._doc);
 }
 
 module.exports = create;
