@@ -14,6 +14,7 @@ async function build(data) {
             site: 'eBay',
             orderId: data.orderId,
             customerId: data.buyer.username,
+            date: data.creationDate,
         },
         totals: {
             item: parseFloat(data.pricingSummary.priceSubtotal.value),
