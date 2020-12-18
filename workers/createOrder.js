@@ -11,18 +11,11 @@ async function create(order) {
     if (!existing) {
         try {
             const payload = await orderBuilder.build(order);
-            return;
 
             const created = await internalOrder.create(payload);
             let orderId = created.id;
 
             await orderItem.createMany(orderId, order);
-
-            const orderData = {};
-
-
-
-            await internalOrder.update(orderId, orderData);
 
             return await ProcessedOrder.create({
                 orderId: orderId,
