@@ -23,11 +23,13 @@ async function build(data) {
         }
     };
 
+    payload.notes = [];
+
     if (data.buyerCheckoutNotes) {
-        payload.notes = {
+        payload.notes.push({
             text: data.buyerCheckoutNotes,
             type: 'customer',
-        };
+        });
     }
 
     if (data.pricingSummary.tax) {
