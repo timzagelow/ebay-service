@@ -15,10 +15,19 @@ async function create(customerData) {
 
 async function update(id, customerData) {
     try {
-        console.log('updating customer');
-        console.log(customerData);
-
         const customer = await axios.put(`${process.env.ORDERS_API_URL}/customers/${id}`, customerData);
+
+        return customer.data;
+    } catch (err) {
+        logger.error(`Could not update the customer`, { error: err.response.data });
+
+        throw Error;
+    }
+}
+
+async function updateAddress(id, customerData) {
+    try {
+        const customer = await axios.post(`${process.env.ORDERS_API_URL}/customers/${id}/address`, customerData);
 
         return customer.data;
     } catch (err) {
@@ -42,4 +51,4 @@ async function fetchByEmail(email) {
     }
 }
 
-module.exports = { create, fetchByEmail, update };
+module.exports = { create, fetchByEmail, update, updateAddress };
