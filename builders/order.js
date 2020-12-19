@@ -74,7 +74,7 @@ async function buildCustomer(shipTo, address) {
 
         return customer;
     } else {
-        await internalCustomer.update(existing.customerId, { address: orderAddress });
+        await internalCustomer.update(existing._id, { address: orderAddress });
 
         existing.address = orderAddress; // only use the current address on the order
         existing.email = shipTo.email;
