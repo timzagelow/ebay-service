@@ -74,10 +74,6 @@ async function buildCustomer(shipTo, address) {
 
         return customer;
     } else {
-        console.log('updating customer address');
-        console.log(existing);
-        console.log(orderAddress);
-
         await internalCustomer.update(existing.customerId, { address: orderAddress });
 
         existing.address = orderAddress; // only use the current address on the order

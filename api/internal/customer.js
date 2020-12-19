@@ -15,6 +15,9 @@ async function create(customerData) {
 
 async function update(id, customerData) {
     try {
+        console.log('updating customer');
+        console.log(customerData);
+
         const customer = await axios.put(`${process.env.ORDERS_API_URL}/customers/${id}`, customerData);
 
         return customer.data;
