@@ -5,8 +5,8 @@ async function buildShipment(orderId) {
 
     return {
         lineItems: buildLineItems(order.items),
-        shippedDate: order.shipping[0].date,
-        trackingNumber: order.shipping[0].tracking,
+        shippedDate: order.shipping.shipments[0].date,
+        trackingNumber: order.shipping.shipments[0].tracking,
     };
 }
 
