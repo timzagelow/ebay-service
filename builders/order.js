@@ -71,6 +71,7 @@ async function buildCustomer(shipTo, address) {
 
         customer.address = orderAddress;
         customer.email = shipTo.email;
+        customer.phone = shipTo.primaryPhone ? shipTo.primaryPhone.phoneNumber : '';
 
         return customer;
     } else {
@@ -78,6 +79,8 @@ async function buildCustomer(shipTo, address) {
 
         existing.address = orderAddress; // only use the current address on the order
         existing.email = shipTo.email;
+        existing.phone = shipTo.primaryPhone ? shipTo.primaryPhone.phoneNumber : '';
+
         console.dir(existing, { depth: null });
 
         return existing;
