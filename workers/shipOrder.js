@@ -5,7 +5,7 @@ const { handleError } = require('../errorHandler');
 async function ship(orderId, ebayOrderId) {
     try {
         const payload = await shipmentBuilder(orderId);
-
+        console.log(payload);
         return await order.ship(ebayOrderId, payload);
     } catch (error) {
         handleError(`Could not ship eBay order ${orderId}`, error);
