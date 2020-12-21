@@ -14,7 +14,7 @@ async function getShippedOrders() {
         const orders = await internalOrder.fetchShipped(lastShippedFetch);
 
         orders.forEach(async order => {
-            await shipOrder(order.orderId);
+            await shipOrder(order.orderId, order.platform.orderId);
         });
 
         await setLastFetch();
