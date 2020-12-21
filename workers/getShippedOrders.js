@@ -17,7 +17,7 @@ async function getShippedOrders() {
             await shipOrder(order.orderId);
         });
 
-        // await setLastFetch();
+        await setLastFetch();
     } catch (err) {
         console.log(err)
     }
