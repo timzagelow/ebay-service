@@ -1,4 +1,4 @@
-const getOrders = require('../workers/getOrders');
+const getShippedOrders = require('../workers/getShippedOrders');
 const db = require('../db');
 const { handleError } = require('../errorHandler');
 const auth = require('../auth');
@@ -13,9 +13,9 @@ module.exports = async function(job) {
 
         api.init();
 
-        return await getOrders();
+        return await getShippedOrders();
     } catch (error) {
-        handleError('Error getting new orders', error);
+        handleError('Error shipping orders', error);
     }
 
     return 'done';

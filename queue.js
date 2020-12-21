@@ -12,9 +12,8 @@ const appRoot = path.resolve(__dirname);
 
 itemQueue.process( appRoot + '/processors/item.js');
 getOrdersQueue.process( appRoot + '/processors/getOrders.js');
-shipOrderQueue.process(appRoot + '/processors/shipOrder.js');
+shipOrderQueue.process(appRoot + '/processors/getShippedOrders.js');
 buildCacheQueue.process(1,appRoot + '/processors/buildCache.js');
-
 
 module.exports = {
     itemQueue,

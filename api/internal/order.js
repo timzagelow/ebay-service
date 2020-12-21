@@ -25,6 +25,18 @@ async function fetch(orderId) {
     }
 }
 
+async function fetchShipped(date) {
+    try {
+        const orders = await axios.get(`${process.env.ORDERS_API_URL}/?shippedAfter=${date}`);
+
+        return orders.data;
+    } catch (err) {
+        logger.error(`Could not fetch the order`, { error: err.response.data });
+
+        throw Error;
+    }
+}
+
 async function update(orderId, orderData) {
     try {
         const order = await axios.put(`${process.env.ORDERS_API_URL}/${orderId}`, orderData);
@@ -37,4 +49,4 @@ async function update(orderId, orderData) {
     }
 }
 
-module.exports = { create, fetch, update };
+module.exports = { create, fetch, update, fetchShipped };
