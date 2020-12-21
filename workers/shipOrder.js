@@ -1,6 +1,6 @@
 const shipmentBuilder = require('../builders/shipment');
 const order = require('../api/partner/order');
-const { handleApiError, handleError } = require('../errorHandler');
+const { handleError } = require('../errorHandler');
 
 async function ship(orderId) {
     try {
@@ -8,7 +8,7 @@ async function ship(orderId) {
 
         return await order.ship(orderId, payload);
     } catch (error) {
-        handleApiError(`Could not create eBay order ${order.orderId}`, error);
+        handleError(`Could not ship eBay order ${order.orderId}`, error);
     }
 }
 
