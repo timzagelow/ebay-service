@@ -7,6 +7,7 @@ async function buildShipment(orderId) {
         lineItems: buildLineItems(order.items),
         shippedDate: order.shipping.shipments[0].date,
         trackingNumber: order.shipping.shipments[0].tracking,
+        shippingCarrierCode: process.env.EBAY_SHIPPING_CARRIER_CODE,
     };
 }
 
