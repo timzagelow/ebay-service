@@ -25,7 +25,7 @@ async function getShippedOrders() {
 
 async function setLastFetch() {
     let date = moment().toISOString();
-    await setAsync('lastOrdersFetch', date);
+    await setAsync('lastShippedFetch', date);
 }
 
 module.exports = getShippedOrders;
