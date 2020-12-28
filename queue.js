@@ -11,11 +11,20 @@ const updateItem = require('./workers/updateItem');
 const buildCache = require('./workers/buildCache');
 const getOrders = require('./workers/getOrders');
 const getShippedOrders = require('./workers/getShippedOrders');
-
+const api = require('./api');
+const ebayAuth = require('./ebayAuth');
+const db = require('./db');
+const auth = require('./auth');
 const { handleError } = require('./errorHandler');
 
 shipOrderQueue.process(async() => {
     try {
+        await db.load();
+        await ebayAuth.getToken();
+        await auth.getToken();
+
+        api.init();
+
         return await getShippedOrders();
     } catch (error) {
         handleError('Error shipping orders', error);
@@ -26,6 +35,12 @@ shipOrderQueue.process(async() => {
 
 getOrdersQueue.process(async() => {
     try {
+        await db.load();
+        await ebayAuth.getToken();
+        await auth.getToken();
+
+        api.init();
+
         return await getOrders();
     } catch (error) {
         handleError('Error getting new orders', error);
@@ -36,6 +51,12 @@ getOrdersQueue.process(async() => {
 
 buildCacheQueue.process(async () => {
     try {
+        await db.load();
+        await ebayAuth.getToken();
+        await auth.getToken();
+
+        api.init();
+
         return await buildCache();
     } catch (error) {
         handleError('Error building cache', error);
@@ -44,7 +65,13 @@ buildCacheQueue.process(async () => {
     return Promise.resolve();
 });
 
-itemQueue.process(jobs => {
+itemQueue.process(async(jobs) => {
+    await db.load();
+    await ebayAuth.getToken();
+    await auth.getToken();
+
+    api.init();
+
     console.log('processing jobs', jobs.data.jobs);
 
     jobs.data.jobs.forEach(async (job) => {
