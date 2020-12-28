@@ -58,9 +58,11 @@ async function buildCache() {
         }
     }
 
-    await setLastChecked();
+    if (newJobs.length) {
+        queue.itemQueue.add({ jobs: newJobs });
+    }
 
-    return newJobs;
+    return await setLastChecked();
 }
 
 function buildItemObject(item) {
