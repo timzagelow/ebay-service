@@ -1,5 +1,18 @@
 require('dotenv').config();
 const queue = require('./queue');
+const api = require('./api');
+const ebayAuth = require('./ebayAuth');
+const db = require('./db');
+const auth = require('./auth');
+
+(async() => {
+    await db.load();
+    await ebayAuth.getToken();
+    await auth.getToken();
+
+    api.init();
+})();
+
 
 // (async() => {
     try {

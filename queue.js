@@ -5,10 +5,6 @@ const getOrdersQueue = new Queue(process.env.EBAY_GET_ORDERS_QUEUE, process.env.
 const shipOrderQueue = new Queue(process.env.EBAY_SHIP_ORDER_QUEUE, process.env.REDIS_CONNECTION_STRING);
 const buildCacheQueue = new Queue(process.env.EBAY_BUILD_CACHE_QUEUE, process.env.REDIS_CONNECTION_STRING);
 
-const ebayAuth = require('./ebayAuth');
-const db = require('./db');
-const auth = require('./auth');
-
 const addItem = require('./workers/addItem');
 const removeItem = require('./workers/removeItem');
 const updateItem = require('./workers/updateItem');
@@ -17,84 +13,75 @@ const getOrders = require('./workers/getOrders');
 const getShippedOrders = require('./workers/getShippedOrders');
 
 const { handleError } = require('./errorHandler');
-const api = require('./api');
 
-(async() => {
-    await db.load();
-    await ebayAuth.getToken();
-    await auth.getToken();
+shipOrderQueue.process(async() => {
+    try {
+        return await getShippedOrders();
+    } catch (error) {
+        handleError('Error shipping orders', error);
+    }
 
-    api.init();
+    return Promise.resolve();
+});
 
-    shipOrderQueue.process(async() => {
-        try {
-            return await getShippedOrders();
-        } catch (error) {
-            handleError('Error shipping orders', error);
+getOrdersQueue.process(async() => {
+    try {
+        return await getOrders();
+    } catch (error) {
+        handleError('Error getting new orders', error);
+    }
+
+    return Promise.resolve();
+});
+
+buildCacheQueue.process(async () => {
+    try {
+        return await buildCache();
+    } catch (error) {
+        handleError('Error building cache', error);
+    }
+
+    return Promise.resolve();
+});
+
+itemQueue.process(jobs => {
+    console.log('processing jobs', jobs.data.jobs);
+
+    jobs.data.jobs.forEach(async (job) => {
+        if (job.type === 'add') {
+            console.log(`adding ${job.itemId}, ${job.listingId}`);
+
+            try {
+                await addItem(job.itemId, job.listingId);
+            } catch (error) {
+                handleError(`Error adding item ${job.itemId}, ${job.listingId}`, error);
+            }
         }
 
-        return Promise.resolve();
-    });
+        if (job.type === 'update') {
+            console.log(`updating ${job.itemId}`);
 
-    getOrdersQueue.process(async() => {
-        try {
-            return await getOrders();
-        } catch (error) {
-            handleError('Error getting new orders', error);
+            try {
+                await updateItem(job.itemId, job.listingId);
+            } catch (error) {
+                handleError(`Error updating item ${job.itemId}, ${job.listingId}`, error);
+            }
         }
 
-        return Promise.resolve();
-    });
+        if (job.type === 'remove') {
+            console.log(`removing ${job.itemId}, ${job.listingId}`);
 
-    buildCacheQueue.process(async () => {
-        try {
-            return await buildCache();
-        } catch (error) {
-            handleError('Error building cache', error);
+            try {
+                await removeItem(job.itemId, job.listingId);
+            } catch (error) {
+                handleError(`Error removing item ${job.itemId}, ${job.listingId}`, error);
+            }
         }
-
-        return Promise.resolve();
     });
 
-    itemQueue.process(jobs => {
-        console.log('processing jobs', jobs.data.jobs);
+    return Promise.resolve();
+});
 
-        jobs.data.jobs.forEach(async (job) => {
-            if (job.type === 'add') {
-                console.log(`adding ${job.itemId}, ${job.listingId}`);
-
-                try {
-                    await addItem(job.itemId, job.listingId);
-                } catch (error) {
-                    handleError(`Error adding item ${job.itemId}, ${job.listingId}`, error);
-                }
-            }
-
-            if (job.type === 'update') {
-                console.log(`updating ${job.itemId}`);
-
-                try {
-                    await updateItem(job.itemId, job.listingId);
-                } catch (error) {
-                    handleError(`Error updating item ${job.itemId}, ${job.listingId}`, error);
-                }
-            }
-
-            if (job.type === 'remove') {
-                console.log(`removing ${job.itemId}, ${job.listingId}`);
-
-                try {
-                    await removeItem(job.itemId, job.listingId);
-                } catch (error) {
-                    handleError(`Error removing item ${job.itemId}, ${job.listingId}`, error);
-                }
-            }
-        });
-
-        return Promise.resolve();
-    });
-
-})();
 
 
 
