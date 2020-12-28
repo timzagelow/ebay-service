@@ -57,7 +57,11 @@ buildCacheQueue.process(async () => {
 
         api.init();
 
-        return await buildCache();
+        const newJobs = await buildCache();
+
+        if (newJobs.length) {
+            itemQueue.add({ jobs: newJobs });
+        }
     } catch (error) {
         handleError('Error building cache', error);
     }
