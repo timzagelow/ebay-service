@@ -4,6 +4,7 @@ const api = require('./api');
 const ebayAuth = require('./ebayAuth');
 const db = require('./db');
 const auth = require('./auth');
+const { handleError } = require('./errorHandler');
 
 (async() => {
     await db.load();
@@ -16,6 +17,24 @@ const auth = require('./auth');
 
 // (async() => {
     try {
+
+        queue.buildCacheQueue.resume();
+
+        queue.getOrdersQueue.on('stalled', (job, error) => {
+            console.log(error);
+            handleError(`getOrdersQueue ${job.id} stalled`, error);
+        });
+
+        queue.buildCacheQueue.on('stalled', (job, error) => {
+            console.log(error);
+            handleError(`buildCacheQueue ${job.id} stalled`, error);
+        });
+
+        queue.shipOrderQueue.on('stalled', (job, error) => {
+            console.log(error);
+            handleError(`shipOrderQueue ${job.id} stalled`, error);
+        });
+
         // queue.getOrdersQueue.add({});
         // queue.buildCacheQueue.add({}, { removeOnComplete: true, removeOnFail: true, limit: 1, repeat: {cron: '0 */2 * * * *'}});        // await queue.buildCacheQueue.pause();
 
