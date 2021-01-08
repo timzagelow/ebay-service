@@ -20,7 +20,7 @@ module.exports = async function(jobs) {
             console.log(`adding ${job.itemId}, ${job.listingId}`);
 
             try {
-                // await addItem(job.itemId, job.listingId);
+                await addItem(job.itemId, job.listingId);
 
             } catch (error) {
                 handleError(`Error adding item ${job.itemId}, ${job.listingId}`, error);
