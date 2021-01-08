@@ -14,12 +14,14 @@ module.exports = async function(jobs) {
 
     console.log('processing jobs', jobs.data.jobs);
 
-    jobs.data.jobs.forEach(async (job) => {
+    await asyncForEach(jobs.data.jobs, async (job) => {
+    // jobs.data.jobs.forEach(async (job) => {
         if (job.type === 'add') {
             console.log(`adding ${job.itemId}, ${job.listingId}`);
 
             try {
-                await addItem(job.itemId, job.listingId);
+                // await addItem(job.itemId, job.listingId);
+
             } catch (error) {
                 handleError(`Error adding item ${job.itemId}, ${job.listingId}`, error);
             }
@@ -44,7 +46,20 @@ module.exports = async function(jobs) {
                 handleError(`Error removing item ${job.itemId}, ${job.listingId}`, error);
             }
         }
+
+        await delay(5000);
+
     });
 
     return 'done';
 };
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function asyncForEach(array, callback) {
+    for (let index = 0; index < array.length; index++) {
+        await callback(array[index], index, array);
+    }
+}

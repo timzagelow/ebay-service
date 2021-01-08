@@ -8,10 +8,10 @@ const buildCacheQueue = new Queue(process.env.EBAY_BUILD_CACHE_QUEUE, process.en
 const path = require('path');
 const appRoot = path.resolve(__dirname);
 
-itemQueue.process( appRoot + '/processors/item.js');
+itemQueue.process( 'itemJobs', 1, appRoot + '/processors/item.js');
 getOrdersQueue.process( appRoot + '/processors/getOrders.js');
 shipOrderQueue.process(appRoot + '/processors/getShippedOrders.js');
-buildCacheQueue.process(1,appRoot + '/processors/buildCache.js');
+buildCacheQueue.process('cacheJobs', 1,appRoot + '/processors/buildCache.js');
 
 module.exports = {
     itemQueue,
