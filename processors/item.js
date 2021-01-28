@@ -47,7 +47,7 @@ module.exports = async function(jobs) {
             }
         }
 
-        await delay(5000);
+        await delay(3000);
 
     });
 
