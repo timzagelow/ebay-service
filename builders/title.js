@@ -17,6 +17,10 @@ function build(item) {
         title += ` ${itemBuilder.duration()}`;
     }
 
+    if ((title.length + itemBuilder.speed().length + ` rpm `) <= process.env.EBAY_TITLE_MAX_LENGTH) {
+        title += ` ${itemBuilder.speed()} rpm`;
+    }
+
     return title.substring(0, process.env.EBAY_TITLE_MAX_LENGTH);
 }
 
