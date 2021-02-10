@@ -34,7 +34,7 @@ module.exports = class build {
         return build.listing.condition.map(c => {
                 return {
                     grade: c.grade,
-                    type: c.subject ? c.subject.charAt(0).toUpperCase() + c.subject.slice(1) : '',
+                    subject: c.subject ? c.subject.charAt(0).toUpperCase() + c.subject.slice(1) : '',
                     notes: c.notes.join(', '),
                 }
         });
