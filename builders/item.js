@@ -75,13 +75,17 @@ module.exports = class build {
     }
 
     static style() {
+        let styles = [];
+
         for (let i in build.item.release.genres) {
             let genre = build.item.release.genres[i];
 
             if (genre.type && genre.type === 'style' && genre.name) {
-                return genre.name;
+                styles.push(genre.name);
             }
         }
+
+        return styles.join(', ');
     }
 
     static speed() {
