@@ -168,7 +168,10 @@ module.exports = class build {
         return build.item.release.media.map(item => {
             let countStr = item.count > 1 ? `${item.count} x ` : ``;
 
-            return `${countStr}${item.size}" ${item.duration} (${item.speed} RPM)`;
+            let str = `${countStr}${item.size}" ${item.duration} (${item.speed} RPM)`;
+            str += item.attributes.join(', ');
+
+            return str;
         })
     }
 };
