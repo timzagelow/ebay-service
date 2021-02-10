@@ -169,7 +169,10 @@ module.exports = class build {
             let countStr = item.count > 1 ? `${item.count} x ` : ``;
 
             let str = `${countStr}${item.size}" ${item.duration} (${item.speed} RPM)`;
-            str += item.attributes.join(', ');
+
+            if (item.attributes && item.attributes.length) {
+                str += ', ' + item.attributes.join(', ');
+            }
 
             return str;
         })
