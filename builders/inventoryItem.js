@@ -45,8 +45,6 @@ function build(item, listingId) {
         aspects['Sleeve Grading'] = [ builder.condition('cover') ];
     }
 
-    console.log(aspects);
-
     let imageUrls = builder.imageUrls();
 
     return {
