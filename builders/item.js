@@ -35,7 +35,7 @@ module.exports = class build {
             let notes = c.notes.join(', ');
 
             if (notes.length) {
-                notes = ', ' + notes;
+                notes = '- ' + notes;
             }
                 return {
                     grade: c.grade === 'SS' ? 'Still Sealed' : c.grade,
