@@ -20,8 +20,7 @@ async function handle(itemId, listingId) {
     }
 
     if (existing && existing.ebayListingId && existing.status === 'active') {
-        console.log(`${itemId}, ${listingId} already exists. Not adding.`);
-        return;
+        throw new Error(`${itemId}, ${listingId} already exists. Not adding.`);
     }
 
     const itemData = await internalItem.fetch(itemId);
