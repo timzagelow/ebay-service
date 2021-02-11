@@ -38,7 +38,7 @@ module.exports = class build {
                 notes = ', ' + notes;
             }
                 return {
-                    grade: c.grade,
+                    grade: c.grade === 'SS' ? 'Still Sealed' : c.grade,
                     subject: c.subject ? c.subject.charAt(0).toUpperCase() + c.subject.slice(1) : '',
                     notes: notes,
                 }

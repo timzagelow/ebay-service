@@ -31,9 +31,9 @@ function build(item, listingId) {
         aspects['Release Year'] = builder.releaseYear();
     }
 
-    if (builder.edition().length) {
-        aspects['Edition'] = builder.edition();
-    }
+    // if (builder.edition().length) {
+    //     aspects['Edition'] = builder.edition();
+    // }
 
     if (builder.findCondition('item')) {
         aspects['Record Grading'] = [ builder.condition('item') ];
