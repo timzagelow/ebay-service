@@ -32,10 +32,15 @@ module.exports = class build {
 
     static conditions() {
         return build.listing.condition.map(c => {
+            let notes = c.notes.join(', ');
+
+            if (notes.length) {
+                notes = ', ' + notes;
+            }
                 return {
                     grade: c.grade,
                     subject: c.subject ? c.subject.charAt(0).toUpperCase() + c.subject.slice(1) : '',
-                    notes: c.notes.join(', '),
+                    notes: notes,
                 }
         });
     }
