@@ -20,7 +20,7 @@ function build(item, listingId) {
     };
 
     if (builder.style()) {
-        aspects['Style'] = builder.style();
+        aspects['Style'] = [ builder.style() ];
     }
 
     if (builder.listing.attributes.length) {
