@@ -6,7 +6,7 @@ const JobError = require('./models/JobError');
 (async() => {
     await db.load();
 
-    const errors = await JobError.find({ error: { $elemMatch: { message: 'A system error has occurred.'}}}).limit(50).sort({ createdAt: -1 });
+    const errors = await JobError.find({ error: { $elemMatch: { message: 'A system error has occurred.'}}}).limit(1).sort({ createdAt: -1 });
 
     let jobs = [];
 
@@ -22,8 +22,9 @@ const JobError = require('./models/JobError');
 
         jobs.push({ type: 'add', itemId: itemId, listingId: listingId });
 
-        // await JobError.remove({ _id: error._id });
+        await JobError.deleteOne({ _id: error._id });
 });
+
     console.log(jobs);
 
     queue.itemQueue.add({ jobs: jobs });
