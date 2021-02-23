@@ -26,6 +26,6 @@ const JobError = require('./models/JobError');
 });
     console.log(jobs);
 
-    queue.itemQueue.add(jobs);
+    queue.itemQueue.add({ jobs: jobs });
 
 })();
