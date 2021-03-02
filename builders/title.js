@@ -21,6 +21,14 @@ function build(item) {
         title += ` ${itemBuilder.speed()}`;
     }
 
+    let grade = itemBuilder.condition();
+
+    if (grade && grade === 'SS') {
+        if ((title.length + ` Sealed`) <= process.env.EBAY_TITLE_MAX_LENGTH) {
+            title += ` Sealed`;
+        }
+    }
+
     return title.substring(0, process.env.EBAY_TITLE_MAX_LENGTH);
 }
 
