@@ -13,7 +13,7 @@ async function create(order) {
             const payload = await orderBuilder.build(order);
 
             const created = await internalOrder.create(payload);
-            let orderId = created.id;
+            let orderId = created.orderId;
 
             await orderItem.createMany(orderId, order);
 
