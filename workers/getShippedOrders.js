@@ -14,7 +14,9 @@ async function getShippedOrders() {
         const orders = await internalOrder.fetchShipped(lastShippedFetch);
 
         orders.forEach(async order => {
-            await shipOrder(order.orderId, order.platform.orderId);
+            if (order.platform.site === 'eBay') {
+                await shipOrder(order.orderId, order.platform.orderId);
+            }
         });
 
         await setLastFetch();
