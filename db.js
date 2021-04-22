@@ -1,5 +1,10 @@
 const mongoose = require('mongoose');
 
+process.on("uncaughtException", (err) => {
+    console.log("process error", err);
+    process.exit(1)
+});
+
 module.exports = class Database {
     static db = null;
 
@@ -10,6 +15,7 @@ module.exports = class Database {
                     { replicaSet: 'rs', useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true, autoReconnect: false });
             } catch (err) {
                 console.error(err);
+                process.exit(1);
             }
         }
 
