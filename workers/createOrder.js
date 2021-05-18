@@ -14,14 +14,13 @@ async function create(order) {
 
             const created = await internalOrder.create(payload);
             let orderId = created.orderId;
-
-            await orderItem.createMany(orderId, order);
-
-            return await ProcessedOrder.create({
+            
+            await ProcessedOrder.create({
                 orderId: orderId,
                 ebayOrderId: order.orderId,
             });
 
+            return orderItem.createMany(orderId, order);
         } catch (error) {
             handleError(`Could not create eBay order ${order.orderId}`, error);
         }

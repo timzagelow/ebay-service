@@ -6,6 +6,7 @@ const setAsync = promisify(client.set).bind(client);
 const moment = require('moment');
 const createOrder = require('./createOrder');
 const apiOrder = require('../api/partner/order');
+const { handleError } = require('../errorHandler');
 
 async function getOrders() {
     try {
@@ -13,19 +14,19 @@ async function getOrders() {
 
         const orders = await apiOrder.fetchNew(lastOrdersFetch);
 
-        // await createOrder(orders[0]);
         orders.forEach(async order => {
             await createOrder(order);
         });
-
-        await setLastFetch();
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        handleError(`Error retrieving orders`, err);
     }
+
+    await setLastFetch();
 }
 
 async function setLastFetch() {
-    let date = moment().toISOString();
+    let date = moment().subtract(12, 'hours').toISOString();
     await setAsync('lastOrdersFetch', date);
 }
 
