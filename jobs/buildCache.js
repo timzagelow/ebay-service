@@ -1,68 +1,78 @@
-const client = require('../redisClient');
-const { promisify } = require('util');
-const getAsync = promisify(client.get).bind(client);
-const setAsync = promisify(client.set).bind(client);
+const redisClient = require('../redisClient');
 const axios = require('axios');
 const moment = require('moment');
 const coder = require('../coder');
 const Cache = require('../models/Cache');
 const EbayItem = require('../models/Item');
-const queue = require('../queue');
+const RedisSMQ = require("rsmq");
+const rsmq = new RedisSMQ({ host: process.env.REDIS_HOST, port: process.env.REDIS_PORT, ns: "rsmq"});
+const auth = require('../auth');
+const api = require('../api');
+const db = require('../db');
 
-async function buildCache() {
-    const items = await getLatest();
+(async() => {
+    try {
+        await db.load();
+        await auth.getToken();
 
-    console.log(`checking for inventory changes`);
-    console.log(`${items.length} items to check against cache`);
+        api.init();
 
-    let newJobs = [];
+        const items = await getLatest();
 
-    for (let i = 0; i < items.length; i++) {
-        let cacheItem = await Cache.findOne({ itemId: items[i].itemId });
-        let encodedItem = buildItemObject(items[i]);
-        let ebayItems = await EbayItem.find({ itemId: items[i].itemId });
+        console.log(`checking for inventory changes`);
+        console.log(`${items.length} items to check against cache`);
 
-        if (!cacheItem) {
-            console.log(`No cache found for item ${items[i].itemId}`);
+        for (let i = 0; i < items.length; i++) {
+            let cacheItem = await Cache.findOne({ itemId: items[i].itemId });
+            let encodedItem = buildItemObject(items[i]);
+            let ebayItems = await EbayItem.find({ itemId: items[i].itemId });
 
-            // add to cache and determine if add job should be created
-            const itemObj = {
-                itemId: items[i].itemId,
-                encodedItem: encodedItem,
-            };
+            if (!cacheItem) {
+                console.log(`No cache found for item ${items[i].itemId}`);
 
-            await Cache.create(itemObj);
+                // add to cache and determine if add job should be created
+                const itemObj = {
+                    itemId: items[i].itemId,
+                    encodedItem: encodedItem,
+                };
 
-            let jobs = getJobs(items[i], ebayItems);
+                await Cache.create(itemObj);
 
-            if (jobs.length) {
-                jobs.forEach(job => {
-                    newJobs.push(job);
-                });
-            }
-        } else {
-            if (cacheItem.encodedItem !== encodedItem) {
-                console.log('cache is different');
                 let jobs = getJobs(items[i], ebayItems);
+                
+                await handleJobs(jobs);
+            } else {
+                if (cacheItem.encodedItem !== encodedItem) {
+                    console.log('cache is different');
+                    let jobs = getJobs(items[i], ebayItems);
 
-                if (jobs.length) {
-                    jobs.forEach(job => {
-                        newJobs.push(job);
-                    });
+                    await handleJobs(jobs);
+
+                    cacheItem.encodedItem = encodedItem;
+
+                    await cacheItem.save();
                 }
-
-                cacheItem.encodedItem = encodedItem;
-
-                await cacheItem.save();
             }
         }
-    }
 
-    if (newJobs.length) {
-        queue.itemQueue.add({ jobs: newJobs });
+        await setLastChecked();
+    } catch(err) {
+        console.log(err);
+    } finally {
+        process.exit();
     }
+})();
 
-    return await setLastChecked();
+async function handleJobs(jobs = []) {
+    for (let i = 0; i < jobs.length; i++) {
+        if (jobs[i].type && jobs[i].type === 'add') {
+            await rsmq.sendMessageAsync({ qname: process.env.ADD_ITEM_QUEUE, message: JSON.stringify(jobs[i]) });
+        } else if (jobs[i].type && jobs[i].type === 'update') {
+            await rsmq.sendMessageAsync({ qname: process.env.UPDATE_ITEM_QUEUE, message: JSON.stringify(jobs[i]) });
+        } else if (jobs[i].type && jobs[i].type === 'remove') {
+            await rsmq.sendMessageAsync({ qname: process.env.REMOVE_ITEM_QUEUE, message: JSON.stringify(jobs[i]) });
+        }
+    }
 }
 
 function buildItemObject(item) {
@@ -134,7 +144,7 @@ function getJobs(item, ebayItems) {
 }
 
 async function getLatest() {
-    const lastInventoryCheck = await getAsync('lastInventoryCheck');
+    const lastInventoryCheck = await redisClient.getAsync('lastInventoryCheck');
 
     const { resp, data } = await axios.get(`${process.env.INVENTORY_API_URL}/new/${lastInventoryCheck}`);
 
@@ -143,7 +153,7 @@ async function getLatest() {
 
 async function setLastChecked() {
     let date = moment().utc().toString();
-    await setAsync('lastInventoryCheck', date);
+    await redisClient.setAsync('lastInventoryCheck', date);
 }
 
 module.exports = buildCache;
