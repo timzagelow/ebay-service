@@ -155,5 +155,3 @@ async function setLastChecked() {
     let date = moment().utc().toString();
     await redisClient.setAsync('lastInventoryCheck', date);
 }
-
-module.exports = buildCache;
