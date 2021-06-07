@@ -1,5 +1,5 @@
 const shipmentBuilder = require('../builders/shipment');
-const order = require('../api/partner/order');
+const orderApi = require('../api/partner/order');
 const { handleError } = require('../errorHandler');
 
 async function ship(order) {
@@ -9,7 +9,7 @@ async function ship(order) {
 
         const payload = await shipmentBuilder(orderId);
         console.log(payload);
-        return await order.ship(ebayOrderId, payload);
+        return await orderApi.ship(ebayOrderId, payload);
     } catch (error) {
         handleError(`Could not ship eBay order ${order.orderId}`, error);
     }
