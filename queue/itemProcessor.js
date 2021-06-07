@@ -12,6 +12,12 @@ async function init(worker, handler) {
 
             await handler(msg.itemId, msg.listingId);
         } catch (error) {
+            console.log(msg);
+            
+            if (error.response && error.response.config && error.response.config.data) {
+                console.log(error.response.config.data);
+            }
+                        
             handleError(error, `item ${msg.itemId}, listing ${msg.listingId}`);
         } finally {
             next();
