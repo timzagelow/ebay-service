@@ -11,7 +11,7 @@ async function ship(order) {
         console.log(payload);
         return await order.ship(ebayOrderId, payload);
     } catch (error) {
-        handleError(`Could not ship eBay order ${orderId}`, error);
+        handleError(`Could not ship eBay order ${order.orderId}`, error);
     }
 }
 
