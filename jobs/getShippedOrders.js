@@ -2,7 +2,7 @@ require('dotenv').config();
 const redisClient = require('../redisClient');
 const moment = require('moment');
 const internalOrder = require('../api/internal/order');
-const shipOrder = require('../workers/shipOrder');
+const shipOrder = require('../handlers/shipOrder');
 const RedisSMQ = require("rsmq");
 const rsmq = new RedisSMQ({ host: process.env.REDIS_HOST, port: process.env.REDIS_PORT, ns: "rsmq"});
 const auth = require('../auth');

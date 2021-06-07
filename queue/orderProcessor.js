@@ -8,7 +8,7 @@ async function init(worker, handler) {
         try {
             msg = JSON.parse(msg);
             
-            console.log(`processing ${id}`);
+            // console.log(`processing ${id}`);
 
             await handler(msg);
         } catch (error) {
