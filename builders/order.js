@@ -133,7 +133,6 @@ function handlePayments(data) {
             amount: parseFloat(payment.amount.value),
             date: payment.paymentDate,
             method: paymentMethods[payment.paymentMethod] || payment.paymentMethod,
-            transactionId: payment.paymentReferenceId,
         }
     // });
 }
