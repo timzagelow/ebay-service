@@ -5,14 +5,9 @@ const internalOrder = require('../api/internal/order');
 const shipOrder = require('../handlers/shipOrder');
 const RedisSMQ = require("rsmq");
 const rsmq = new RedisSMQ({ host: process.env.REDIS_HOST, port: process.env.REDIS_PORT, ns: "rsmq"});
-const auth = require('../auth');
-const api = require('../api');
 
-(async() => {
+async function getShippedOrders() {
     try {
-        await auth.getToken();
-        api.init();
-
         const lastShippedFetch = await redisClient.getAsync('lastShippedFetch');
 
         const orders = await internalOrder.fetchShipped(lastShippedFetch);
@@ -28,12 +23,12 @@ const api = require('../api');
         await setLastFetch();
     } catch (err) {
         console.log(err)
-    } finally {
-        process.exit();
     }
-})();
+}
 
 async function setLastFetch() {
     let date = moment().toISOString();
     await redisClient.setAsync('lastShippedFetch', date);
 }
+
+module.exports = getShippedOrders;

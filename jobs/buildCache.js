@@ -6,17 +6,9 @@ const Cache = require('../models/Cache');
 const EbayItem = require('../models/Item');
 const RedisSMQ = require("rsmq");
 const rsmq = new RedisSMQ({ host: process.env.REDIS_HOST, port: process.env.REDIS_PORT, ns: "rsmq"});
-const auth = require('../auth');
-const api = require('../api');
-const db = require('../db');
 
-(async() => {
+async function buildCache() {
     try {
-        await db.load();
-        await auth.getToken();
-
-        api.init();
-
         const items = await getLatest();
 
         console.log(`checking for inventory changes`);
@@ -58,10 +50,8 @@ const db = require('../db');
         await setLastChecked();
     } catch(err) {
         console.log(err);
-    } finally {
-        process.exit();
     }
-})();
+}
 
 async function handleJobs(jobs = []) {
     for (let i = 0; i < jobs.length; i++) {
@@ -155,3 +145,5 @@ async function setLastChecked() {
     let date = moment().utc().toString();
     await redisClient.setAsync('lastInventoryCheck', date);
 }
+
+module.exports = buildCache;

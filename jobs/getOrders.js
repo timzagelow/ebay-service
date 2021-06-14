@@ -5,18 +5,9 @@ const apiOrder = require('../api/partner/order');
 const { handleError } = require('../errorHandler');
 const RedisSMQ = require("rsmq");
 const rsmq = new RedisSMQ({ host: process.env.REDIS_HOST, port: process.env.REDIS_PORT, ns: "rsmq"});
-const db = require('../db');
-const auth = require('../auth');
-const ebayAuth = require('../ebayAuth');
-const api = require('../api');
 
-(async() => {
+async function getOrders() {
     try {
-        await db.load();
-        await ebayAuth.getToken();
-        await auth.getToken();
-        api.init();
-
         const lastOrdersFetch = await redisClient.getAsync('lastOrdersFetch');
 
         const orders = await apiOrder.fetchNew(lastOrdersFetch);
@@ -29,13 +20,12 @@ const api = require('../api');
     } catch (err) {
         console.log(err);
         handleError(`Error retrieving orders`, err);
-    } finally {
-        process.exit();
     }
-
-})();
+}
 
 async function setLastFetch() {
     let date = moment().subtract(12, 'hours').toISOString();
     await redisClient.setAsync('lastOrdersFetch', date);
 }
+
+module.exports = getOrders;
