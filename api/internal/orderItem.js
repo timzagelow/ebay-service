@@ -22,6 +22,9 @@ async function createMany(orderId, order) {
         console.dir(payload, { depth: null });
 
         try {
+            dbItem.status = 'inactive';
+            await dbItem.save();
+            
             const orderItem = await axios.post(`${process.env.ORDERS_API_URL}/${orderId}/item`, payload);
 
             if (orderItem && orderItem.data) {
