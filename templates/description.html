@@ -191,6 +191,9 @@
             <h4 class="no-top-padding">{{ artist }}<br>{{ title }}</h4>
             <div class="horiz-margin no-paragraph-margin">
                 <p><strong>Label:</strong> {{ label }} {{ catalogNo }}</p>
+                {{#if deadwax}}<p><strong>Deadwax:</strong> {{ deadwax }}</p>{{/if}}
+                {{#if locale}}<p><strong>Locale:</strong> {{ locale }}</p>{{/if}}
+                {{#if address}}<p><strong>Address:</strong> {{ address }}</p>{{/if}}
                 <p><strong>Format:</strong> {{ format }}</p>
                 {{#each condition}}
                 <p><strong>{{ this.subject }} Condition:</strong> {{ this.grade }}
