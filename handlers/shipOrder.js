@@ -8,7 +8,7 @@ async function ship(order) {
         const ebayOrderId = order.platform.orderId;
 
         const payload = await shipmentBuilder(orderId);
-        console.log(payload);
+
         return await orderApi.ship(ebayOrderId, payload);
     } catch (error) {
         handleError(`Could not ship eBay order ${order.orderId}`, error);

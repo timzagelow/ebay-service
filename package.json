@@ -15,7 +15,6 @@
   "homepage": "https://bitbucket.org/timzagelow/ebay-service#readme",
   "dependencies": {
     "axios": "^0.21.0",
-    "bull": "^3.20.0",
     "dotenv": "^8.2.0",
     "handlebars": "^4.7.6",
     "moment": "^2.29.1",

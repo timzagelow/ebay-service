@@ -1,7 +1,7 @@
+require('dotenv').config();
 const Handlebars = require('handlebars');
-const fs = require('fs');
-const path = require('path');
 const builder = require('../builders/item');
+const axios = require('axios');
 
 async function build(item) {
     const view = {
@@ -24,8 +24,8 @@ async function build(item) {
         clips: builder.clipUrls(),
     };
 
-    const templateStr = await fs.readFileSync(path.resolve(__dirname, "../templates/description.html")).toString();
-    const template = Handlebars.compile(templateStr);
+    const { data } = await axios.get(process.env.LISTING_DESCRIPTION_TEMPLATE);
+    const template = Handlebars.compile(data);
 
     return template(view);
 }
